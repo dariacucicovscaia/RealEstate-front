@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from "react";
+import {Route, Routes} from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import Registration from "./components/Registration";
+import Home from "./components/Home";
+import UserC from "./components/User";
+import Navigation from "./components/Navigation";
+import AppointmentComponent from "./components/AppointmentComponent";
+import EstateComponent from "./components/EstateComponent";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+    render() {
+        return (
+            <div>
+                <Navigation/>
+                <div>
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/register" element={<Registration/>}/>
+                        <Route path="/login" element={<UserC/>}/>
+                        <Route path="/appointment" element={<AppointmentComponent/>}/>
+                        <Route path="/estate" element={<EstateComponent/>}/>
+                    </Routes>
+                </div>
+            </div>
+        );
+    }
 }
 
 export default App;
