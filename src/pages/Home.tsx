@@ -1,4 +1,8 @@
-const HomePage = () => {
+
+
+function HomePage (){
+
+
     return (
         <>Home</>
     )

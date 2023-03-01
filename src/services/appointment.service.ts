@@ -4,24 +4,32 @@ import Page from "../types/Page";
 
 
 class AppointmentService {
-    createAppointment(appointment: Appointment, userId: bigint) {
-        return http.post<Appointment>(`/appointment/create/${userId}`, appointment);
+    async createAppointment(appointment: Appointment, userId: bigint) {
+        return await http.post<Appointment>(`/appointment/create/${userId}`, appointment);
     }
 
-    getByAppointmentById(appointmentId: number) {
-        return http.get<Appointment>(`/appointment/details/${appointmentId}`);
+    async getByAppointmentById(appointmentId: number) {
+        return await http.get<Appointment>(`/appointment/details/${appointmentId}`);
     }
 
-    updateAppointmentById(appointmentId: bigint | undefined, appointment: Appointment) {
-        return http.put<Appointment>(`/appointment/update/${appointmentId}`, appointment);
+    async updateAppointmentById(appointmentId: bigint | undefined, appointment: Appointment) {
+        return await http.put<Appointment>(`/appointment/update/${appointmentId}`, appointment);
     }
 
-    updateAppointmentByIntoConfirmed(appointmentId: bigint | undefined) {
-        return http.put<Appointment>(`/appointment/update/confirm-status/${appointmentId}`);
+    async updateAppointmentByIntoConfirmed(appointmentId: bigint | undefined) {
+        return await http.put<Appointment>(`/appointment/update/confirm-status/${appointmentId}`);
     }
 
-    getAppointmentsByUserId(userId: number, pageSize: number, pageNumber: number) {
-        return http.get<Page<Appointment>>(`/appointment/myAppointments/${userId}`, {params: {page: pageNumber, size: pageSize}})
+    async getAppointmentsByUserId(userId: number, pageSize: number, pageNumber: number, authHeader :string) {
+        return await http.get<Page<Appointment>>(`/appointment/myAppointments/${userId}`, {
+            params: {
+                page: pageNumber,
+                size: pageSize
+            },
+            headers:{
+                "Authorization" :  authHeader
+            }
+        })
     }
 
 }

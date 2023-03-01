@@ -1,23 +1,21 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {FormControl, FormGroup, Input, InputLabel} from "@mui/material";
 import {useForm} from "react-hook-form";
 import {useState} from "react";
-import User from "../types/User";
-import UserService from "../services/user.service";
 import IEstateSearchFilter from "../types/IEstateSearchFilter";
-import EstateService from "../services/estate.service";
 import IEstate from "../types/IEstate";
+import { useAuthUser} from "react-auth-kit";
+
+
 
 function EstateComponent() {
-    const [open, setOpen] = React.useState(false);
-
+    const [open, setOpen] = useState(false);
+    const authUser = useAuthUser();
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -29,18 +27,24 @@ function EstateComponent() {
     const [estates, setEstates] = useState<IEstate[]>();
 
     const onSubmit = handleSubmit((data) => {
-        console.log(data)
-        EstateService.getAllEstatesByAllCriteria(data, 10, 1).then(res => {
-
-        })
+        console.log(authUser.arguments)
+       console.log(data)
+        // EstateService.getAllEstatesByAllCriteria(data, 10, 1).then(res => {
+        //
+        // })
     })
+    const click =()=> {
+        console.log(authUser())
+    }
+
+
     return (
         <div>
             <Button variant="outlined" onClick={handleClickOpen}>
                 Open form dialog
             </Button>
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Subscribe</DialogTitle>
+                <DialogTitle>Filter Estates</DialogTitle>
                 <DialogContent>
                     <FormGroup onSubmit={onSubmit} defaultValue="rounded" sx={{
 
@@ -140,21 +144,13 @@ function EstateComponent() {
                             <InputLabel htmlFor="priceTo">priceTo</InputLabel>
                             <Input {...register('priceTo')} id="priceTo" name="priceTo" type="text"/>
                         </FormControl>
-
-                        <Button sx={{
-                            background: "red",
-                            color: "white",
-                            fontWeight: "bolder",
-                        }}>
-                            Save
-                        </Button>
                     </FormGroup>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleClose}>Subscribe</Button>
+                    <Button onClick={handleClose}>Search</Button>
                 </DialogActions>
             </Dialog>
+            <button onClick={click}>cc</button>
         </div>
     );
 }

@@ -3,8 +3,8 @@ import User from "../types/User";
 
 
 class UserService {
-    getByEmail(email: string | undefined) {
-        return http.get<User>(`/user/email/${email}`);
+    async getByEmail(email: string | undefined) {
+        return await http.get<User>(`/user/email/${email}`);
     }
 
     createUser(user : User){

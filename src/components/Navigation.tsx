@@ -5,11 +5,17 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-
-const pages = [''];
+import {useIsAuthenticated, useSignOut} from "react-auth-kit";
+import {useNavigate} from "react-router-dom";
 
 function ResponsiveAppBar() {
-
+    const isAuthenticated = useIsAuthenticated()
+    const signOut = useSignOut();
+    const navigate = useNavigate();
+    const logout = () => {
+        signOut();
+        navigate("/home")
+    }
     return (
         <AppBar position="static" sx={{
             background: "white",
@@ -31,36 +37,57 @@ function ResponsiveAppBar() {
                     >
                         RealEstate
                     </Typography>
+                    {
+                        isAuthenticated()?  <Box sx={{flexGrow: 0}}>
 
-                    <Box sx={{flexGrow: 0}}>
 
+                                    <Button
+                                        sx={{
+                                            mr: 2,
+                                            display: {xs: 'none', md: 'flex'},
+                                            color: 'white',
+                                            background: "red",
+                                            borderRadius: "8px"
+                                        }}
+                                        onClick={logout}
+                                    >
+                                        Sign out
+                                    </Button>
+
+
+                        </Box>
+                            :
+                            <><Box sx={{flexGrow: 0}}>
+
+                                <Button
+                                    href="/register"
+                                    sx={{
+                                        mr: 2,
+                                        color: 'black',
+                                        background: "white",
+                                        borderRadius: "8px"
+                                    }}
+                                >
+                                    Register
+                                </Button>
+                            </Box>
+                        <Box sx={{flexGrow: 0}}>
                         <Button
-                            href="/register"
-                            sx={{
-                                mr: 2,
-                                color: 'black',
-                                background: "white",
-                                borderRadius: "8px"
-                            }}
+                        href="/login"
+                        sx={{
+                        mr: 2,
+                        display: {xs: 'none', md: 'flex'},
+                        color: 'white',
+                        background: "red",
+                        borderRadius: "8px"
+                    }}
                         >
-                            Register
-                        </Button>
-                    </Box>
-                    <Box sx={{flexGrow: 0}}>
-                        <Button
-                            href="/login"
-                            sx={{
-                                mr: 2,
-                                display: {xs: 'none', md: 'flex'},
-                                color: 'white',
-                                background: "red",
-                                borderRadius: "8px"
-                            }}
-                        >
-                            Sign up
+                        Sign up
                         </Button>
 
-                    </Box>
+                        </Box></>
+                    }
+
                 </Toolbar>
             </Container>
         </AppBar>
