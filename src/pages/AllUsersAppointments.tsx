@@ -1,4 +1,4 @@
-import React, {SyntheticEvent, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import AppointmentService from "../services/appointment.service";
 
@@ -11,10 +11,10 @@ import Box from "@mui/material/Box";
 
 function AllUsersAppointments() {
     const [appointments, setAppointments] = useState<Page<Appointment>>()
-    const authHeader = useAuthHeader();
     const [page, setPage] = useState<number>(1);
     const pageSize = 4;
     const [loaded, setLoaded] = useState(false);
+    const authHeader = useAuthHeader();
     const authUser = useAuthUser();
 
     const getPageNumber = () => {

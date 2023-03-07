@@ -38,7 +38,7 @@ function Registration() {
     return (
         <>
             <Box justifyContent={"center"} alignItems={"center"} display={"flex"}
-                 sx={{margin: "20px 0px", outline: "outlined"}}>
+                 sx={{margin: "0.05%", outline: "outlined"}}>
 
                 <Grid sx={{width: '45%'}}>
                     <br/>
@@ -53,7 +53,7 @@ function Registration() {
                             Already have an account?
                             &nbsp;
                             <Link
-                                href="/src/pages/Login"
+                                href="login"
                                 underline="hover"
                                 variant="subtitle2"
                                 sx={{
@@ -66,12 +66,10 @@ function Registration() {
                         </Typography>
                     </Stack>
                     <br/>
-                    <br/>
                     <FormGroup  defaultValue="rounded">
 
                         <FormControl>
                             <TextField  {...register('email')} id="email" label="email" type="text" sx={{m: 0.50}}/>
-                            {/*<FormHelperText id="email">We'll never share your email.</FormHelperText>*/}
                         </FormControl>
                         <FormControl>
                             <TextField {...register('password')} id="password" label="password" type="password"
@@ -101,7 +99,7 @@ function Registration() {
                                        sx={{m: 0.50}}/>
                         </FormControl>
                     </FormGroup>
-                    <br/><br/>
+                    <br/>
                     <Box justifyContent={"right"} alignItems={"right"} display={"flex"}>
                         <Button onClick={onSubmit} sx={{
                             background: "red",

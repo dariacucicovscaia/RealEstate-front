@@ -12,10 +12,14 @@ function ResponsiveAppBar() {
     const isAuthenticated = useIsAuthenticated()
     const signOut = useSignOut();
     const navigate = useNavigate();
+
     const logout = () => {
         signOut();
-        navigate("/home")
+        navigate("/")
     }
+
+
+
     return (
         <AppBar position="static" sx={{
             background: "white",
@@ -38,10 +42,27 @@ function ResponsiveAppBar() {
                         RealEstate
                     </Typography>
                     {
-                        isAuthenticated()?  <Box sx={{flexGrow: 0}}>
+                        isAuthenticated() ? <Box sx={{flexGrow: 0}}>
+                                <Button
+                                    sx={{
+                                        mr: 2,
+                                        display: {xs: 'none', md: 'flex'},
+                                        color: 'white',
+                                        background: "red",
+                                        borderRadius: "8px"
+                                    }}
+                                    onClick={logout}
+                                >
+                                    Sign out
+                                </Button>
 
 
+                            </Box>
+                            :
+                            <>
+                                <Box sx={{flexGrow: 0}}>
                                     <Button
+                                        href="/login"
                                         sx={{
                                             mr: 2,
                                             display: {xs: 'none', md: 'flex'},
@@ -49,43 +70,11 @@ function ResponsiveAppBar() {
                                             background: "red",
                                             borderRadius: "8px"
                                         }}
-                                        onClick={logout}
                                     >
-                                        Sign out
+                                        Sign in
                                     </Button>
 
-
-                        </Box>
-                            :
-                            <><Box sx={{flexGrow: 0}}>
-
-                                <Button
-                                    href="/register"
-                                    sx={{
-                                        mr: 2,
-                                        color: 'black',
-                                        background: "white",
-                                        borderRadius: "8px"
-                                    }}
-                                >
-                                    Register
-                                </Button>
-                            </Box>
-                        <Box sx={{flexGrow: 0}}>
-                        <Button
-                        href="/login"
-                        sx={{
-                        mr: 2,
-                        display: {xs: 'none', md: 'flex'},
-                        color: 'white',
-                        background: "red",
-                        borderRadius: "8px"
-                    }}
-                        >
-                        Sign up
-                        </Button>
-
-                        </Box></>
+                                </Box></>
                     }
 
                 </Toolbar>

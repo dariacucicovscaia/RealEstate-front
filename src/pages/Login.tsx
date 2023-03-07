@@ -5,10 +5,9 @@ import {useForm} from "react-hook-form";
 import {Box, FormControl, FormGroup, Grid, Input, InputLabel, Link, Stack} from "@mui/material";
 import Button from "@mui/material/Button";
 import JwtService from "../services/jwt.service";
-import {useSignIn} from "react-auth-kit";
 import {useNavigate} from "react-router-dom";
 import Typography from "@mui/material/Typography";
-
+import {useSignIn} from "react-auth-kit";
 
 const Login = () => {
     const {register, handleSubmit} = useForm<LoginDTO>();
@@ -54,7 +53,7 @@ const Login = () => {
                                 fontWeight: "bolder"
                             }}
                         >
-                            Register
+                            Create account
                         </Link>
                     </Typography>
                 </Stack>

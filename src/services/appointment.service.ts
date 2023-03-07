@@ -1,11 +1,17 @@
 import Appointment from "../types/Appointment";
 import http from "../http-common";
 import Page from "../types/Page";
+import {Dayjs} from "dayjs";
+import AppointmentDTO from "../types/AppointmentDTO";
 
 
 class AppointmentService {
-    async createAppointment(appointment: Appointment, userId: bigint) {
-        return await http.post<Appointment>(`/appointment/create/${userId}`, appointment);
+    async createAppointment(start: (Dayjs | null), userId: number, estateId: number, authHeader: string) {
+        return await http.post<AppointmentDTO>(`/appointment/create/${start?.format("YYYY-MM-DDTHH:mm:ss")}/${userId}/${estateId}`,{},{
+            headers:{
+                "Authorization" :  authHeader
+            }
+        });
     }
 
     async getByAppointmentById(appointmentId: number) {

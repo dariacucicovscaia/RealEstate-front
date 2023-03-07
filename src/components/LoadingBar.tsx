@@ -3,7 +3,6 @@ import {LinearProgress} from "@mui/material";
 
 
 function LoadingBar() {
-
     const [value, setValue] = useState(0);
     useEffect(() => {
         const interval = setInterval(() => {
