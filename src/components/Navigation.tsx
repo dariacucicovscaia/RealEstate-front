@@ -5,19 +5,19 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import {useIsAuthenticated, useSignOut} from "react-auth-kit";
+import {useAuthUser, useIsAuthenticated, useSignOut} from "react-auth-kit";
 import {useNavigate} from "react-router-dom";
 
 function ResponsiveAppBar() {
     const isAuthenticated = useIsAuthenticated()
     const signOut = useSignOut();
     const navigate = useNavigate();
+    const authUser = useAuthUser();
 
     const logout = () => {
         signOut();
         navigate("/")
     }
-
 
 
     return (
@@ -42,6 +42,44 @@ function ResponsiveAppBar() {
                         RealEstate
                     </Typography>
                     {
+                        authUser()?.roles.map((role: string) => {
+                            if (role === 'ADMIN') {
+                                return (
+                                    <Button
+                                        sx={{
+                                            mr: 2,
+                                            display: {xs: 'none', md: 'flex'},
+                                            color: 'black',
+                                            fontWeight:"bolder",
+                                            background: "white",
+                                            borderRadius: "8px"
+                                        }}
+                                        href="/adminPanel"
+                                    >
+                                        Admin Panel
+                                    </Button>
+                                )
+                            }
+                            if(role === 'SELLER'){
+                                return (
+                                    <Button
+                                        sx={{
+                                            mr: 2,
+                                            display: {xs: 'none', md: 'flex'},
+                                            color: 'black',
+                                            fontWeight:"bolder",
+                                            background: "white",
+                                            borderRadius: "8px"
+                                        }}
+                                        href="/registerEstate"
+                                    >
+                                       Register Property
+                                    </Button>
+                                )
+                            }
+                        })
+                    }
+                    {
                         isAuthenticated() ? <Box sx={{flexGrow: 0}}>
                                 <Button
                                     sx={{
@@ -49,6 +87,7 @@ function ResponsiveAppBar() {
                                         display: {xs: 'none', md: 'flex'},
                                         color: 'white',
                                         background: "red",
+                                        fontWeight:"bolder",
                                         borderRadius: "8px"
                                     }}
                                     onClick={logout}

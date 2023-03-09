@@ -5,32 +5,75 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import {
-    FormControl,
+    AppBar,
+    Box, Card, CardMedia, Checkbox,
+    FormControl, FormControlLabel,
     FormGroup,
     Grid,
     Input,
     InputLabel,
-    MenuItem,
-    Select,
+    Modal,
+    Tab, Tabs,
     TextField
 } from "@mui/material";
 import {useForm} from "react-hook-form";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import IEstateSearchFilter from "../types/IEstateSearchFilter";
-import {useAuthHeader} from "react-auth-kit";
-import EstateService from "../services/estate.service";
-import IEstate from "../types/IEstate";
-import Page from "../types/Page";
 import EstatesList from "../components/EstatesList";
-import Home from "./Home";
 import {useNavigate} from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import filterIcon from "../assets/icons/filter.svg"
+import homeImage from "../assets/homePage.webp";
 
-enum PaymentTransactionType {
-    SALE = "SALE", RENT = "RENT", LEASE = "LEASE"
+interface TabPanelProps {
+    children?: React.ReactNode;
+    dir?: string;
+    index: PaymentTransactionType;
+    value: PaymentTransactionType;
 }
 
 enum AcquisitionStatus {
-    OPEN = "OPEN", ON_HOLD = "ON_HOLD"
+    OPEN,
+    ON_HOLD
+}
+
+enum PaymentTransactionType {
+    SALE,
+    RENT,
+    LEASE
+}
+
+function TabPanel(props: TabPanelProps) {
+    const {children, value, index, ...other} = props;
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`full-width-tabpanel-${index}`}
+            aria-labelledby={`full-width-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box sx={{p: 3}}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+}
+
+function PaymentTransactionTypeIndex(index: PaymentTransactionType) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
+
+function AcquisitionStatusIndex(index: AcquisitionStatus) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
 }
 
 enum TypeOfEstate {
@@ -59,98 +102,200 @@ enum TypeOfEstate {
 
 function EstateFilterComponent() {
     const [open, setOpen] = useState(false);
-    const authHeader = useAuthHeader();
-    const {register, handleSubmit} = useForm<IEstateSearchFilter>();
-    const [estates, setEstates] = useState<Page<IEstate>>();
+    const [openModalTypeOfEstate, setOpenModalTypeOfEstate] = useState(false);
+    const [paymentTransactionType, setPaymentTransactionType] = useState<PaymentTransactionType>(PaymentTransactionType.RENT);
+    const [acquisitionStatus, setAcquisitionStatus] = useState<AcquisitionStatus>(AcquisitionStatus.OPEN);
+    const [filterSubmitted, setFilterSubmitted] = useState(false);
+
+    const [state, setState] = useState({
+        MAGAZINE: false,
+        RESTAURANT: false,
+        CAFE: false,
+        HOTEL: false,
+        SALON: false,
+        OFFICE: false,
+    });
+    const {MAGAZINE, RESTAURANT, CAFE, HOTEL, SALON, OFFICE} = state;
+
+
+    const {register, handleSubmit, setValue} = useForm<IEstateSearchFilter>();
     const navigate = useNavigate()
+    const [loaded, setLoaded] = useState(false)
+
+    const handleChange = (event: React.SyntheticEvent, newValue: PaymentTransactionType) => {
+        setPaymentTransactionType(newValue);
+        setValue('paymentTransactionType', newValue)
+    };
+    const handleStateOfTypeOfEstateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.name)
+        console.log(event.target.checked)
+        setState({
+            ...state,
+            [event.target.name]: event.target.checked,
+        });
+    };
+
+
+    const handleChangeAcquisitionStatus = (event: React.SyntheticEvent, newValue: AcquisitionStatus) => {
+        setAcquisitionStatus(newValue);
+        setValue('acquisitionStatus', newValue)
+    };
 
     const handleClickOpen = () => {
         setOpen(true);
+    };
+    const handleOpenModalForTypeOfEstate = () => {
+        setOpenModalTypeOfEstate(true);
     };
 
     const handleClose = () => {
         setOpen(false);
     };
+    const handleCloseModalTypesOfEstate = () => {
+        console.log(state)
+
+        // @ts-ignore
+        const keys = Object.keys(state).filter(k => state[k]);
+
+        console.log(keys)
+        setValue('typeOfEstates', keys)
+        setOpenModalTypeOfEstate(false);
+    };
+    const [estateSearchFilter, setEstateSearchFilter] = useState<IEstateSearchFilter>();
 
     const onSubmit = handleSubmit((data) => {
         console.log(data)
-        EstateService.getAllEstatesByAllCriteria(data, 10, 1).then(res => {
-            setEstates(res.data);
-        })
-        navigate("/estate")
+        setEstateSearchFilter(data)
+        setFilterSubmitted(true)
         handleClose()
+
     })
-
-
+    useEffect(() => {
+        setLoaded(true)
+    })
     return (
-        <div>
-            <Button variant="outlined" onClick={handleClickOpen}>
-                Open filter
-            </Button>
-            <Dialog fullWidth={true} open={open}
-                    onClose={handleClose}>
+        <div className="container">{
+            filterSubmitted ?
+                <Box justifyContent={"end"} alignItems={"end"} display={"flex"}>
+                    <Button
+                        sx={{
+                            background: "#F1F1F1",
+                            color: "black",
+                            fontWeight: "bolder",
+                            m: 0.50,
+                            marginRight: "15%",
+                            borderRadius: '10px',
+                            width: '10%'
+
+                        }}
+                        onClick={handleClickOpen}
+                    >
+                        <img src={filterIcon}/>Filter
+                    </Button>
+                </Box>
+
+                : <Box justifyContent={"center"} alignItems={"center"} display={"flex"} mt="2%">
+                    <Card sx={{maxWidth: "100%", maxHeight: "100%", borderRadius: "25px"}}>
+                        <Box sx={{position: 'relative'}}>
+                            <CardMedia
+                                component="img"
+                                image={homeImage}
+                            />
+
+                            <Typography variant="h5" style={{
+                                fontFamily: 'Arial',
+                                fontWeight: "bold",
+                                position: "absolute",
+                                top: "7%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                            }}>
+                                Find your perfect home
+                            </Typography>
+
+                            <Button
+                                sx={{
+                                    position: "absolute",
+                                    top: "19%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -50%)",
+                                    background: "#F1F1F1",
+                                    color: "black",
+                                    fontWeight: "bolder",
+                                    borderRadius: '10px',
+                                    width: '50%',
+
+                                }}
+                                onClick={handleClickOpen}
+                            >
+                                <img src={filterIcon}/>Filter
+                            </Button>
+                        </Box>
+                    </Card>
+                </Box>
+        }
+
+            <Dialog open={open}
+                    onClose={handleClose}
+                    maxWidth={false}
+            >
                 <DialogTitle>Filter Estates</DialogTitle>
                 <DialogContent>
                     <FormGroup defaultValue="rounded" sx={{
                         alignItems: "center"
                     }}>
-                        <Grid container spacing={"50px"}>
-                            <Grid item xs={12} sm={"auto"}>
-                                <FormControl>
-                                    <label>PaymentTransactionType</label>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={PaymentTransactionType.RENT}
-                                        label="Age"
-                                        {...register('paymentTransactionType')}
-                                    >
-                                        <MenuItem value={PaymentTransactionType.SALE}>sale</MenuItem>
-                                        <MenuItem value={PaymentTransactionType.RENT}>rent</MenuItem>
-                                        <MenuItem value={PaymentTransactionType.LEASE}>lease</MenuItem>
-                                    </Select>
-                                    {/*    <FormControlLabel*/}
-                                    {/*        control={<Input type="checkbox" {...register('paymentTransactionType')} value={PaymentTransactionType.RENT}/>}*/}
-                                    {/*        label={PaymentTransactionType.RENT}*/}
-                                    {/*    />*/}
-                                    {/*    <FormControlLabel*/}
-                                    {/*        control={<Input type="checkbox" {...register('paymentTransactionType')} value={PaymentTransactionType.LEASE}/>}*/}
-                                    {/*        label={PaymentTransactionType.LEASE}*/}
-                                    {/*    />*/}
-                                    {/*    <FormControlLabel*/}
-                                    {/*        control={<Input type="checkbox" {...register('paymentTransactionType')}  value={PaymentTransactionType.SALE}/>}*/}
-                                    {/*        label={PaymentTransactionType.SALE}*/}
-                                    {/*    />*/}
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} sm={"auto"}>
-                                <label>AcquisitionStatus</label>
-                                <FormControl>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        value={AcquisitionStatus.OPEN}
-                                        label="Age"
-                                        {...register('acquisitionStatus')}
-                                    >
-                                        <MenuItem value={AcquisitionStatus.OPEN}>open</MenuItem>
-                                        <MenuItem value={AcquisitionStatus.ON_HOLD}>on hold</MenuItem>
-                                    </Select>
-                                    {/*<FormControlLabel*/}
-                                    {/*    {...register('acquisitionStatus')}*/}
-                                    {/*    control={<Input   type="checkbox" defaultChecked value={AcquisitionStatus.OPEN}/>}*/}
-                                    {/*    label={AcquisitionStatus.OPEN}*/}
-                                    {/*/>*/}
-                                    {/*<FormControlLabel*/}
-                                    {/*    {...register('acquisitionStatus')}*/}
-                                    {/*    control={<Input   type="checkbox" defaultChecked value={AcquisitionStatus.ON_HOLD}/>}*/}
-                                    {/*    label={AcquisitionStatus.ON_HOLD}*/}
-                                    {/*/>*/}
-                                </FormControl>
-                            </Grid>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
+
+                            <FormControl>
+                                <Box sx={{width: 600}}>
+                                    <AppBar position="static">
+                                        <Tabs
+                                            value={paymentTransactionType}
+                                            onChange={handleChange}
+                                            sx={{
+                                                backgroundColor: "white",
+                                            }}
+                                            variant="fullWidth"
+
+                                        >
+                                            <Tab
+                                                label="SALE" {...PaymentTransactionTypeIndex(PaymentTransactionType.SALE)} />
+                                            <Tab
+                                                label="RENT" {...PaymentTransactionTypeIndex(PaymentTransactionType.RENT)} />
+                                            <Tab
+                                                label="LEASE" {...PaymentTransactionTypeIndex(PaymentTransactionType.LEASE)} />
+                                        </Tabs>
+                                    </AppBar>
+                                </Box>
+                            </FormControl>
                         </Grid>
 
-                        <Grid container spacing={"2px"}>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
+                            <FormControl>
+
+                                <Box sx={{width: 600}}>
+                                    <AppBar position="static">
+                                        <Tabs
+                                            value={acquisitionStatus}
+                                            onChange={handleChangeAcquisitionStatus}
+                                            sx={{
+                                                backgroundColor: "white",
+                                            }}
+                                            variant="fullWidth"
+                                            aria-label="full width tabs example"
+
+                                        >
+                                            <Tab label="OPEN" {...AcquisitionStatusIndex(AcquisitionStatus.OPEN)} />
+                                            <Tab
+                                                label="ON-HOLD" {...AcquisitionStatusIndex(AcquisitionStatus.ON_HOLD)} />
+                                        </Tabs>
+                                    </AppBar>
+                                </Box>
+                            </FormControl>
+                        </Grid>
+
+
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
                             <Grid item xs={12} sm={"auto"}>
                                 <FormControl>
                                     <TextField {...register('squareMetersFrom')} id="squareMetersFrom"
@@ -167,7 +312,7 @@ function EstateFilterComponent() {
                             </Grid>
                         </Grid>
 
-                        <Grid container spacing={"2px"}>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
                             <Grid item xs={12} sm={"auto"}>
                                 <FormControl>
                                     <TextField {...register('numberOfRoomsFrom')} id="numberOfRoomsFrom"
@@ -184,7 +329,7 @@ function EstateFilterComponent() {
                             </Grid>
                         </Grid>
 
-                        <Grid container spacing={"2px"}>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
                             <Grid item xs={12} sm={"auto"}>
                                 <FormControl>
                                     <TextField {...register('numberOfBathroomsFrom')} id="numberOfBathroomsFrom"
@@ -198,7 +343,7 @@ function EstateFilterComponent() {
                                 </FormControl>
                             </Grid>
                         </Grid>
-                        <Grid container spacing={"2px"}>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
                             <Grid item xs={12} sm={"auto"}>
                                 <FormControl>
                                     <TextField {...register('numberOfGaragesFrom')} id="numberOfGaragesFrom"
@@ -212,7 +357,7 @@ function EstateFilterComponent() {
                                 </FormControl>
                             </Grid>
                         </Grid>
-                        <Grid container spacing={"2px"}>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
                             <Grid item xs={12} sm={"auto"}>
                                 <FormControl>
                                     <TextField {...register('yearOfConstructionFrom')} id="yearOfConstructionFrom"
@@ -228,7 +373,7 @@ function EstateFilterComponent() {
                             </Grid>
                         </Grid>
 
-                        <Grid container spacing={"2px"}>
+                        <Grid container spacing={"2px"} sx={{marginTop: 1}}>
                             <Grid item xs={12} sm={"auto"}>
                                 <FormControl>
                                     <TextField {...register('priceFrom')} defaultValue={0} id="priceFrom"
@@ -244,20 +389,62 @@ function EstateFilterComponent() {
                         </Grid>
 
                         <FormControl>
-                            <InputLabel htmlFor="typeOfEstate">typeOfEstate</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={TypeOfEstate.OFFICE}
-                                label="Age"
-                                {...register('typeOfEstate')}
+                            <Button onClick={handleOpenModalForTypeOfEstate}>Choose type of estate</Button>
+                            <Modal
+                                open={openModalTypeOfEstate}
+                                onClose={handleCloseModalTypesOfEstate}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
                             >
-                                <MenuItem value={TypeOfEstate.BARN}>BARN</MenuItem>
-                                <MenuItem value={TypeOfEstate.BUNGALOW}>BUNGALOW</MenuItem>
-                                <MenuItem value={TypeOfEstate.RAILROAD}>RAILROAD</MenuItem>
-                                <MenuItem value={TypeOfEstate.LOFT}>LOFT</MenuItem>
-                                <MenuItem value={TypeOfEstate.OFFICE}>OFFICE</MenuItem>
-                            </Select>
+                                <Box sx={{
+                                    position: 'absolute' as 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: 500,
+                                    bgcolor: 'white',
+                                    borderRadius: '10px',
+                                    boxShadow: 24,
+                                    p: 4,
+                                }}>
+                                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                                        Property Type
+                                    </Typography>
+                                    <FormControlLabel control={
+                                        <Checkbox checked={MAGAZINE} onChange={handleStateOfTypeOfEstateChange}
+                                                  name={TypeOfEstate.MAGAZINE}/>
+                                    } label={TypeOfEstate.MAGAZINE}/>
+                                    <FormControlLabel control={
+                                        <Checkbox checked={RESTAURANT} onChange={handleStateOfTypeOfEstateChange}
+                                                  name={TypeOfEstate.RESTAURANT}/>
+                                    } label={TypeOfEstate.RESTAURANT}/>
+                                    <FormControlLabel control={
+                                        <Checkbox checked={CAFE} onChange={handleStateOfTypeOfEstateChange}
+                                                  name={TypeOfEstate.CAFE}/>
+                                    } label={TypeOfEstate.CAFE}/>
+                                    <FormControlLabel control={
+                                        <Checkbox checked={HOTEL} onChange={handleStateOfTypeOfEstateChange}
+                                                  name={TypeOfEstate.HOTEL}/>
+                                    } label={TypeOfEstate.HOTEL}/>
+                                    <FormControlLabel control={
+                                        <Checkbox checked={SALON} onChange={handleStateOfTypeOfEstateChange}
+                                                  name={TypeOfEstate.SALON}/>
+                                    } label={TypeOfEstate.SALON}/>
+                                    <FormControlLabel control={
+                                        <Checkbox checked={OFFICE} onChange={handleStateOfTypeOfEstateChange}
+                                                  name={TypeOfEstate.OFFICE}/>
+                                    } label={TypeOfEstate.OFFICE}/>
+
+                                    <Button sx={{
+                                        background: "#F1F1F1",
+                                        color: "black",
+                                        fontWeight: "bolder",
+                                        m: 0.50,
+                                        width: '25%',
+                                        borderRadius: 2
+                                    }} onClick={handleCloseModalTypesOfEstate}>choose</Button>
+                                </Box>
+                            </Modal>
                         </FormControl>
 
 
@@ -273,11 +460,20 @@ function EstateFilterComponent() {
                     </FormGroup>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onSubmit} >Search</Button>
+                    <Button sx={{
+                        background: "#F1F1F1",
+                        color: "black",
+                        fontWeight: "bolder",
+                        m: 0.50,
+                        width: '25%',
+                        borderRadius: 2
+                    }} onClick={onSubmit}>Search</Button>
                 </DialogActions>
             </Dialog>
-            {estates ?
-                <EstatesList pageableEstateList={estates} key={estates.currentPage}/>
+            {estateSearchFilter ?
+                <EstatesList estateFilter={estateSearchFilter}
+                             key={estateSearchFilter.typeOfEstates + estateSearchFilter.yearOfConstructionFrom}/>
+
                 : <></>
             }
         </div>

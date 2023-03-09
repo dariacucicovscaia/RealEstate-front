@@ -10,7 +10,7 @@ export const Layout = ({children}: Props) => {
         <div>
             <Navigation/>
             {children}
-            <Footer/>
+            {/*<Footer/>*/}
         </div>
     )
 }

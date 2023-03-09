@@ -14,6 +14,10 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {useNavigate} from "react-router-dom";
+import EstateDTO from "../types/EstateDTO";
+import EstateService from "../services/estate.service";
+import {useAuthUser} from "react-auth-kit";
+
 
 type RegistrationDTO = {
     email: string
@@ -26,17 +30,18 @@ type RegistrationDTO = {
     country: string
 }
 
-function Registration() {
-    const {register, handleSubmit} = useForm<RegistrationDTO>();
-    const [user, setUser] = useState<User>();
+function EstateRegistration() {
+    const {register, handleSubmit, setValue} = useForm<EstateDTO>();
+    const [estate, setEstate] = useState<EstateDTO>();
     const navigate = useNavigate();
+    const authUser = useAuthUser();
 
     const onSubmit = handleSubmit(data => {
-        UserService.createUser(data).then(res => {
-            setUser(res.data)
+        setValue('email', authUser()?.email)
+        EstateService.createEstateWithAllDetails(data).then(res => {
+            setEstate(res.data)
         })
-        console.log(user)
-        navigate("/login")
+        console.log(estate)
     })
     return (
         <>
@@ -48,12 +53,12 @@ function Registration() {
                     <br/>
                     <Stack>
                         <Typography variant="h4">
-                            Register
+                            Register Your Estate
                         </Typography>
                         <Typography
                             color="text.secondary"
                             variant="body2">
-                            Already have an account?
+                            View all your estates
                             &nbsp;
                             <Link
                                 href="login"
@@ -64,32 +69,34 @@ function Registration() {
                                     fontWeight: "bolder"
                                 }}
                             >
-                                Log in
+                                here
                             </Link>
                         </Typography>
                     </Stack>
                     <br/>
                     <FormGroup defaultValue="rounded">
-
                         <FormControl>
-                            <TextField  {...register('email')} id="email" label="email" type="text" sx={{m: 0.50}}/>
-                        </FormControl>
-                        <FormControl>
-                            <TextField {...register('password')} id="password" label="password" type="password"
+                            <TextField {...register('squareMeters')} id="squareMeters" label="squareMeters" type="text"
                                        sx={{m: 0.50}}/>
                         </FormControl>
                         <FormControl>
-                            <TextField {...register('firstName')} id="firstName" label="firstName" type="text"
+                            <TextField {...register('numberOfRooms')} id="numberOfRooms" label="numberOfRooms" type="text"
                                        sx={{m: 0.50}}/>
                         </FormControl>
                         <FormControl>
-                            <TextField {...register('lastName')} id="lastName" label="lastName" type="text"
+                            <TextField {...register('numberOfBathRooms')} id="numberOfBathRooms" label="numberOfBathRooms" type="text"
                                        sx={{m: 0.50}}/>
                         </FormControl>
                         <FormControl>
-                            <TextField {...register('phoneNumber')} id="phoneNumber" label="phoneNumber" type="text"
+                            <TextField {...register('numberOfGarages')} id="numberOfGarages" label="numberOfGarages" type="text"
                                        sx={{m: 0.50}}/>
-                        </FormControl>
+                        </FormControl> <FormControl>
+                        <TextField {...register('yearOfConstruction')} id="yearOfConstruction" label="yearOfConstruction" type="text"
+                                   sx={{m: 0.50}}/>
+                    </FormControl> <FormControl>
+                        <TextField {...register('typeOfEstate')} id="typeOfEstate" label="typeOfEstate" type="text"
+                                   sx={{m: 0.50}}/>
+                    </FormControl>
                         <FormControl>
                             <TextField {...register('fullAddress')} id="fullAddress" label="fullAddress" type="text"
                                        sx={{m: 0.50}}/>
@@ -99,6 +106,14 @@ function Registration() {
                         </FormControl>
                         <FormControl>
                             <TextField {...register('country')} id="country" label="country" type="text"
+                                       sx={{m: 0.50}}/>
+                        </FormControl>
+                        <FormControl>
+                            <TextField {...register('price')} id="price" label="price" type="text"
+                                       sx={{m: 0.50}}/>
+                        </FormControl>
+                        <FormControl>
+                            <TextField {...register('currency')} id="currency" label="currency" type="text"
                                        sx={{m: 0.50}}/>
                         </FormControl>
                     </FormGroup>
@@ -123,4 +138,4 @@ function Registration() {
 
 }
 
-export default Registration;
+export default EstateRegistration;

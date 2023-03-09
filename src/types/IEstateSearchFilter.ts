@@ -1,9 +1,9 @@
 enum PaymentTransactionType {
-    SALE, RENT, LEASE
+    SALE , RENT, LEASE
 }
 
 enum AcquisitionStatus {
-    OPEN, ON_HOLD, SOLD
+    OPEN, ON_HOLD
 }
 
 enum TypeOfEstate {
@@ -49,7 +49,7 @@ export default interface IEstateSearchFilter {
     yearOfConstructionFrom: string;
     yearOfConstructionTo: string;
 
-    typeOfEstate: TypeOfEstate;
+    typeOfEstates: string[];
 
     city:string;
     country:string;

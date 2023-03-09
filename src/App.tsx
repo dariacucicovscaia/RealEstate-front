@@ -11,6 +11,8 @@ import AdminPanel from "./pages/AdminPanel";
 import {AuthRoute} from "./components/AuthRoute";
 import EstateDetails from "./components/EstateDetails";
 import EstatePage from "./pages/EstatePage";
+import EstateRegistration from "./pages/RegisterEstateForm";
+import EstateFilterComponent from "./pages/EstateFilterComponent";
 
 
 class App extends Component {
@@ -19,16 +21,18 @@ class App extends Component {
             <Layout>
                 <Routes>
                     <Route path="/login" element={<Login/>}/>
-                    <Route path="/" element={<Home/>}/>
+                    <Route path="/" element={<EstateFilterComponent/>}/>
                     <Route path="/appointments" element={
                         <RequireAuth loginPath="/login">
                             <AllUsersAppointments/>
                         </RequireAuth>}/>
-                    <Route path="/estate" element={<EstatePage />}/>
                     <Route path="/details/:id"  element = {<EstateDetails/>}/>
 
                     <Route element={<AuthRoute allowedRoles={["ADMIN"]}/>}>
                         <Route path="/adminPanel" element={<AdminPanel/>}/>
+                    </Route>
+                    <Route element={<AuthRoute allowedRoles={["SELLER"]}/>}>
+                        <Route path="/registerEstate" element={<EstateRegistration/>}/>
                     </Route>
                 </Routes>
             </Layout>
