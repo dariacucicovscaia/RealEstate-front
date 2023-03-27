@@ -31,8 +31,8 @@ enum TypeOfEstate {
 }
 
 export default interface IEstateSearchFilter {
-    paymentTransactionType :PaymentTransactionType;
-    acquisitionStatus:AcquisitionStatus;
+    paymentTransactionType? :PaymentTransactionType;
+    acquisitionStatus?:AcquisitionStatus;
 
     squareMetersFrom :number;
     squareMetersTo :number;
@@ -56,4 +56,6 @@ export default interface IEstateSearchFilter {
 
     priceFrom :number;
     priceTo :number;
+
+    latestAdded:boolean;
 }

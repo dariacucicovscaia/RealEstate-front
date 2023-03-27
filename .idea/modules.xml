@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../Documents/GitHub/library-frontend/.idea/library-frontend.iml" filepath="$PROJECT_DIR$/../Documents/GitHub/library-frontend/.idea/library-frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../file-uploader/.idea/file-uploader.iml" filepath="$PROJECT_DIR$/../file-uploader/.idea/file-uploader.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/real-estate-front.iml" filepath="$PROJECT_DIR$/.idea/real-estate-front.iml" />
     </modules>
   </component>

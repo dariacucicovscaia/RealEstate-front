@@ -1,16 +1,15 @@
 import React, {useEffect, useState} from "react";
-import IEstate from "../types/IEstate";
-import EstateService from "../services/estate.service";
-import EstateDTO from "../types/EstateDTO";
-import bedroomIcon from '../assets/icons/bedroom-icon.svg';
-import bathroomIcon from '../assets/icons/bath-room-icom.svg';
-import garageIcon from '../assets/icons/garage-property-svgrepo-com.svg';
+import IEstate from "../../types/IEstate";
+import EstateService from "../../services/estate.service";
+import EstateDTO from "../../types/EstateDTO";
+import bedroomIcon from '../../assets/icons/bedroom-icon.svg';
+import bathroomIcon from '../../assets/icons/bath-room-icom.svg';
+import garageIcon from '../../assets/icons/garage-property-svgrepo-com.svg';
 import Box from "@mui/material/Box";
 import {useNavigate} from "react-router-dom";
 import {ImageList, ImageListItem} from "@mui/material";
 import Button from "@mui/material/Button";
-import EstateDetails from "./EstateDetails";
-
+import squareMeters from "../../assets/icons/square.svg";
 
 const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
     const [estateDetails, setEstateDetails] = useState<EstateDTO>();
@@ -23,7 +22,7 @@ const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
         )
     }, [estate])
     return (
-        <div className="card" style={{width: "85%"}}>
+        <div className="card">
             <div className="card__name">
 
             </div>
@@ -35,7 +34,7 @@ const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
                                 <img className="img-fluid" src={photo}/>
                             </ImageListItem>
                         )
-                        else return (<img className="img-fluid" src="/estate/noEstate.png"/>)
+                        else return ( <ImageListItem key={"/estate/noEstate.png"}><img className="img-fluid" src="/estate/noEstate.png"/></ImageListItem>)
                     })}
 
                 </ImageList>
@@ -48,6 +47,8 @@ const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
                         <div style={{margin: "5%"}}>{estateDetails?.numberOfRooms}</div>
                         <img src={bathroomIcon}/>
                         <div style={{margin: "5%"}}>{estateDetails?.numberOfBathRooms}</div>
+                        <img src={squareMeters}/>
+                        <div style={{margin: "5%"}}>{estateDetails?.squareMeters}m&#178;</div>
                         {
                             (estateDetails?.numberOfGarages !== 0) ?
                                 <><img src={garageIcon}/>

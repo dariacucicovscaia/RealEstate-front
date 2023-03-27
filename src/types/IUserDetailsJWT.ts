@@ -1,10 +1,10 @@
 
 enum Roles{
-    ADMIN, SELLER, USER
+    ADMIN,  USER
 }
 export interface IUserDetailsJWT {
     id: number;
     email: string;
     roles: Roles[];
-    exp: string;
+    exp: number;
 }

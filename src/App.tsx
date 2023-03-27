@@ -4,38 +4,58 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import Login from "./pages/Login";
 import {Layout} from "./components/Layout";
-import Home from "./pages/Home";
 import AllUsersAppointments from "./pages/AllUsersAppointments";
 import {RequireAuth} from "react-auth-kit";
 import AdminPanel from "./pages/AdminPanel";
-import {AuthRoute} from "./components/AuthRoute";
-import EstateDetails from "./components/EstateDetails";
-import EstatePage from "./pages/EstatePage";
-import EstateRegistration from "./pages/RegisterEstateForm";
+import {AuthRoute} from "./components/auth/AuthRoute";
+import EstateDetails from "./components/estate/EstateDetails";
 import EstateFilterComponent from "./pages/EstateFilterComponent";
-
+import OwnerEstates from "./pages/OwnersEstates";
+import SessionFinished from "./components/auth/SessionFinished";
+import AppointmentConfirmationPage from "./pages/AppointmentConfirmationPage";
+import DynamicAppProperties from "./pages/DynamicAppProperties";
+import ProfilePage from "./pages/Profile";
+import NotFound from "./pages/NotFound";
+import EditProfile from "./pages/EditProfile";
+import CreateEstateForm from "./components/multistep/CreateEstateForm";
 
 class App extends Component {
     render() {
         return (
-            <Layout>
-                <Routes>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/" element={<EstateFilterComponent/>}/>
-                    <Route path="/appointments" element={
-                        <RequireAuth loginPath="/login">
-                            <AllUsersAppointments/>
-                        </RequireAuth>}/>
-                    <Route path="/details/:id"  element = {<EstateDetails/>}/>
+            <SessionFinished>
+                <Layout>
+                    <Routes>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/" element={<EstateFilterComponent/>}/>
+                        <Route path="/appointments" element={
+                            <RequireAuth loginPath="/login">
+                                <AllUsersAppointments/>
 
-                    <Route element={<AuthRoute allowedRoles={["ADMIN"]}/>}>
-                        <Route path="/adminPanel" element={<AdminPanel/>}/>
-                    </Route>
-                    <Route element={<AuthRoute allowedRoles={["SELLER"]}/>}>
-                        <Route path="/registerEstate" element={<EstateRegistration/>}/>
-                    </Route>
-                </Routes>
-            </Layout>
+                            </RequireAuth>}
+                        />
+                        <Route path="/editProfile" element={
+                            <RequireAuth loginPath="/login">
+                                <EditProfile/>
+                            </RequireAuth>}
+                        />
+                        <Route path="confirm-appointment/:appointmentId" element={<AppointmentConfirmationPage/>}/>
+                        <Route path="/details/:id" element={<EstateDetails/>}/>
+
+                        <Route element={<AuthRoute allowedRoles={["ADMIN"]}/>}>
+                            <Route path="/adminPanel" element={<AdminPanel/>}/>
+                            <Route path="/dynamic-app-props" element={<DynamicAppProperties/>}/>
+                        </Route>
+                        <Route element={<AuthRoute allowedRoles={["USER"]}/>}>
+                            <Route path="/myAppointments" element={<AllUsersAppointments/>}/>
+                            <Route path="/profile" element={<ProfilePage/>}/>
+                            {/*<Route path="/registerEstate" element={<EstateRegistration/>}/>*/}
+                            <Route path="/registerEstate" element={<CreateEstateForm/>}/>
+                            <Route path="/allMyEstates" element={<OwnerEstates/>}/>
+                        </Route>
+                        <Route path="*" element={<NotFound/>}/>
+                    </Routes>
+                </Layout>
+            </SessionFinished>
 
         );
     }

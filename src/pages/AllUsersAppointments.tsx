@@ -1,18 +1,16 @@
 import React, {useEffect, useState} from "react";
 
 import AppointmentService from "../services/appointment.service";
-
 import Page from "../types/Page";
 import Appointment from "../types/Appointment";
 import {useAuthHeader, useAuthUser} from "react-auth-kit";
 import {Pagination} from "@mui/material";
-import LoadingBar from "../components/LoadingBar";
 import Box from "@mui/material/Box";
 
 function AllUsersAppointments() {
     const [appointments, setAppointments] = useState<Page<Appointment>>()
     const [page, setPage] = useState<number>(1);
-    const pageSize = 4;
+    const pageSize = 8;
     const [loaded, setLoaded] = useState(false);
     const authHeader = useAuthHeader();
     const authUser = useAuthUser();
@@ -29,7 +27,6 @@ function AllUsersAppointments() {
         setPage(page);
     };
 
-
     useEffect(() => {
             // @ts-ignore
         AppointmentService.getAppointmentsByUserId(authUser().id, pageSize, page, authHeader()).then(res => {
@@ -44,7 +41,7 @@ function AllUsersAppointments() {
     })
 
     return (
-        <div>
+        <div className="container">
             {loaded ?
                 <div>
                     {Array.isArray(appointments?.content) ?
@@ -83,7 +80,7 @@ function AllUsersAppointments() {
                     </Box>
                 </div>
                 :
-                <LoadingBar/>}
+                <></>}
         </div>
     )
 }

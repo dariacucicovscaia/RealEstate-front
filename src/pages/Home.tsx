@@ -19,7 +19,7 @@ function HomePage() {
                             image={homeImage}
                         />
 
-                        <Typography variant="h5" style={{
+                        <Typography variant="h6" style={{
                             fontFamily: 'Arial',
                             fontWeight: "bold",
                             position: "absolute",

@@ -1,5 +1,5 @@
 export default interface User {
-    id?: bigint;
+    id?: number;
     email: string;
     password: string;
 }

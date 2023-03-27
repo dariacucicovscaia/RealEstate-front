@@ -8,6 +8,7 @@ import {AuthProvider} from "react-auth-kit";
 import Registration from "./pages/Registration";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import SessionFinished from "./components/auth/SessionFinished";
 
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);

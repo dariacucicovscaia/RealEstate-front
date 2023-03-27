@@ -5,7 +5,7 @@ export default interface Appointment {
     madeAt: string;
     start: string;
     end: string;
-    appointmentStatus: string;
+    appointmentStatus: boolean;
     estate: Estate
 
 }
