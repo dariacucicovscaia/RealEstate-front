@@ -2,27 +2,20 @@ import React, {useEffect, useState} from "react";
 import UserService from "../services/user.service";
 import {useAuthHeader, useAuthUser} from "react-auth-kit";
 import AdminPanelFullUser from "../types/AdminPanelFullUser";
-import {
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    Divider, Grid,
-    Typography
-} from '@mui/material';
+import {Avatar, Box, Button, Card, CardActions, CardContent, Divider, Grid, Typography} from '@mui/material';
 import Cookies from "universal-cookie";
-import EditProfile from "./EditProfile";
+import EditProfile from "../components/EditProfile";
 import IProfile from "../types/IProfile";
 import axios from "axios";
+import {routes} from "../config/routes";
 
 const ProfilePage = () => {
     const [loaded, setLoaded] = useState(false)
     const auth = useAuthUser();
     const authHeader = useAuthHeader();
     const [user, setUser] = useState<AdminPanelFullUser>()
-    const [profilePicture, setProfilePicture] = useState<IProfile>()
+    const [updatedProfile, setUpdatedProfile] = useState<IProfile>()
+    const [profilePic, setProfilePic] = useState<string>()
     const cookies = new Cookies();
 
 
@@ -37,19 +30,24 @@ const ProfilePage = () => {
     const handleChange = (event) => {
         const fileUploaded = event.target.files[0];
         console.log(fileUploaded)
+        const userEmail = auth()?.email.substring(0, auth()?.email.lastIndexOf("@"))
 
-        UserService.addProfilePicture(fileUploaded.name, auth()?.id, authHeader()).then((response) => {
-                setProfilePicture(response.data)
+        UserService.addProfilePicture(("/profileImg/" + userEmail + "/" + fileUploaded.name), auth()?.id, authHeader()).then((response) => {
+                setUpdatedProfile(response.data)
             }
         )
         const data = new FormData();
         data.append('file', fileUploaded)
-        axios.post('http://localhost:5000/upload', data,{
+        data.append('userName', userEmail)
+        axios.post(routes.STATIC_CONTENT_URL + '/upload', data, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
-            .then((response) => console.log(response))
+            .then((response) => {
+                console.log(response)
+                setProfilePic(routes.STATIC_CONTENT_URL + response.data?.fileName)
+            })
             .catch((e) => console.error(e))
 
     };
@@ -60,7 +58,7 @@ const ProfilePage = () => {
                 cookies.set('userProfileUpdate', resp.data)
             }
         )
-    }, [loaded, profilePicture])
+    }, [loaded, profilePic])
 
     return (
         <div>
@@ -85,7 +83,7 @@ const ProfilePage = () => {
                                         }}
                                     >
                                         <Avatar
-                                            src={user?.profilePicture}
+                                            src={routes.STATIC_CONTENT_URL + user?.profilePicture}
                                             sx={{
                                                 height: 80,
                                                 mb: 2,
@@ -137,7 +135,8 @@ const ProfilePage = () => {
                         </Box>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <EditProfile/></Grid>
+                        <EditProfile/>
+                    </Grid>
                 </Grid>
             </Grid>
         </div>

@@ -1,9 +1,11 @@
 import {Form, Formik} from "formik";
 import * as yup from "yup";
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {FormContext} from "../CreateEstateForm";
 import Button from "@mui/material/Button";
-import {Grid, Stack} from "@mui/material";
+import {Box, Grid, Stack} from "@mui/material";
+import {useAuthUser} from "react-auth-kit";
+import {routes} from "../../../config/routes";
 
 
 function UploadPictures() {
@@ -11,13 +13,13 @@ function UploadPictures() {
     const {activeStepIndex, setActiveStepIndex, formData, setFormData, files, setFiles} = useContext(FormContext);
     const hiddenFileInput = React.useRef(null);
     const [uploadedPictures, setUploadedPictures] = useState<File[]>();
-
+    const [imageUrl, setImageUrl] = useState([""]);
+    const user = useAuthUser();
     const handleClick = (event: any) => {
         event.preventDefault();
         // @ts-ignore
         hiddenFileInput.current.click();
     };
-
 
     const ValidationSchema = yup.object().shape({});
 
@@ -33,10 +35,10 @@ function UploadPictures() {
             validationSchema={ValidationSchema}
             onSubmit={(values) => {
                 const data = {...formData, ...values};
-                console.log(files)
                 setFormData(data);
                 setFiles(uploadedPictures);
                 setActiveStepIndex(activeStepIndex + 1);
+
                 console.log(values)
             }}
         >
@@ -71,12 +73,22 @@ function UploadPictures() {
 
                                 files.map(file => {
                                     // @ts-ignore
-                                    values.estatePhotos.push("/estate/"+file.name)
+                                    values.estatePhotos.push("/estate/" + user()?.email.substring(0, user()?.email.lastIndexOf("@"))+"/"+ file.name)
+                                    imageUrl.push(URL.createObjectURL(file))
                                 })
+
                             }}
                             style={{display: "none"}}
                         />
-
+                        <Box justifyContent="center" alignItems="center" display="flex">
+                            {
+                                imageUrl &&
+                                uploadedPictures &&
+                                imageUrl.map((image) => {
+                                    return (<img src={image} height="200px" style={{margin:"2px"}}/>)
+                                })
+                            }
+                        </Box>
                     </div>
                     <Grid container spacing={1}>
                         <Grid item xs={12} md={6}>

@@ -10,6 +10,7 @@ import {useNavigate} from "react-router-dom";
 import {ImageList, ImageListItem} from "@mui/material";
 import Button from "@mui/material/Button";
 import squareMeters from "../../assets/icons/square.svg";
+import {routes} from "../../config/routes";
 
 const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
     const [estateDetails, setEstateDetails] = useState<EstateDTO>();
@@ -20,59 +21,69 @@ const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
                 setEstateDetails(res.data)
             }
         )
+        console.log(estate.estatePhotos)
     }, [estate])
     return (
-        <div className="card">
-            <div className="card__name">
+        <div className="col">
+            <div className="card h-100">
+                <div className="card-body">
+                    <ImageList sx={{display: "flex"}} cols={4} rowHeight={164}>
+                        { estate.estatePhotos.map((photo: string) => {
+                            if (photo) return (
+                                <ImageListItem key={photo}>
+                                    <img className="img-fluid" style={{
+                                        width: "100%",
+                                        height: "auto"
+                                    }} src={routes.STATIC_CONTENT_URL + photo}/>
+                                </ImageListItem>
+                            )
+                            else return (
+                                <ImageListItem key={routes.STATIC_CONTENT_URL + "/estate/estateNotFound.png"}>
+                                    <img
+                                    className="img-fluid"
+                                    style={{
+                                        height: "160px"
+                                    }}
+                                    src={routes.STATIC_CONTENT_URL + "/estate/estateNotFound.png"}/></ImageListItem>)
+                        })}
 
-            </div>
-            <div className="card-body">
-                <ImageList sx={{width: "100%", height: 200}} cols={4} rowHeight={164}>
-                    {estate.estatePhotos.map((photo: string) => {
-                        if (photo) return (
-                            <ImageListItem key={photo}>
-                                <img className="img-fluid" src={photo}/>
-                            </ImageListItem>
-                        )
-                        else return ( <ImageListItem key={"/estate/noEstate.png"}><img className="img-fluid" src="/estate/noEstate.png"/></ImageListItem>)
-                    })}
-
-                </ImageList>
-                <h3>{estateDetails?.price} {estateDetails?.currency}</h3>
-                <Box justifyContent={"left"} alignItems={"left"} display={"flex"} sx={{
-                    margin: "20px 0px"
-                }}>
-                    <div className="d-flex">
-                        <img src={bedroomIcon}/>
-                        <div style={{margin: "5%"}}>{estateDetails?.numberOfRooms}</div>
-                        <img src={bathroomIcon}/>
-                        <div style={{margin: "5%"}}>{estateDetails?.numberOfBathRooms}</div>
-                        <img src={squareMeters}/>
-                        <div style={{margin: "5%"}}>{estateDetails?.squareMeters}m&#178;</div>
-                        {
-                            (estateDetails?.numberOfGarages !== 0) ?
-                                <><img src={garageIcon}/>
-                                    <div style={{margin: "5%"}}> {estateDetails?.numberOfGarages}</div>
-                                </>
-                                : <></>
-                        }
-                        <div style={{margin: "5%"}}>|</div>
-                        <div style={{margin: "5%"}}>{estateDetails?.typeOfEstate}</div>
-                    </div>
-                </Box>
-                <Box justifyContent={"right"} alignItems={"right"} display={"flex"}>
-                    <Button onClick={() =>navigate("/details/"+estate.id)}
-                            sx={{
-                                background: "#F1F1F1",
-                                color: "black",
-                                fontWeight: "bolder",
-                                m: 0.50,
-                                width: '25%',
-                                borderRadius: 2
-                            }}>
-                        details
-                    </Button>
-                </Box>
+                    </ImageList>
+                    <h3>{estateDetails?.price} {estateDetails?.currency}</h3>
+                    <Box justifyContent={"left"} alignItems={"left"} display={"flex"} sx={{
+                        margin: "20px 0px"
+                    }}>
+                        <div className="d-flex">
+                            <img src={bedroomIcon}/>
+                            <div style={{margin: "5%"}}>{estateDetails?.numberOfRooms}</div>
+                            <img src={bathroomIcon}/>
+                            <div style={{margin: "5%"}}>{estateDetails?.numberOfBathRooms}</div>
+                            <img src={squareMeters}/>
+                            <div style={{margin: "5%"}}>{estateDetails?.squareMeters}m&#178;</div>
+                            {
+                                (estateDetails?.numberOfGarages !== 0) ?
+                                    <><img src={garageIcon}/>
+                                        <div style={{margin: "5%"}}> {estateDetails?.numberOfGarages}</div>
+                                    </>
+                                    : <></>
+                            }
+                            <div style={{margin: "5%"}}>|</div>
+                            <div style={{margin: "5%"}}>{estateDetails?.typeOfEstate}</div>
+                        </div>
+                    </Box>
+                    <Box justifyContent={"right"} alignItems={"right"} display={"flex"}>
+                        <Button onClick={() => navigate("/details/" + estate.id)}
+                                sx={{
+                                    background: "#F1F1F1",
+                                    color: "black",
+                                    fontWeight: "bolder",
+                                    m: 0.50,
+                                    width: '25%',
+                                    borderRadius: 2
+                                }}>
+                            details
+                        </Button>
+                    </Box>
+                </div>
             </div>
         </div>
     )

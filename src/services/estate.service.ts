@@ -1,4 +1,4 @@
-import http from "../http-common";
+import http from "../config/http-common";
 import EstateDTO from "../types/EstateDTO";
 import IEstate from "../types/IEstate";
 import IEstateSearchFilter from "../types/IEstateSearchFilter";

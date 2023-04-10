@@ -4,7 +4,23 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import {AppBar, Box, Card, CardMedia, Checkbox, createTheme, FormControl, FormControlLabel, FormGroup, Grid, Modal, Pagination, Tab, Tabs, TextField, ThemeProvider
+import {
+    AppBar,
+    Box,
+    Card,
+    CardMedia,
+    Checkbox,
+    createTheme, Divider,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    Grid,
+    Modal,
+    Pagination,
+    Tab,
+    Tabs,
+    TextField,
+    ThemeProvider
 } from "@mui/material";
 import {useForm} from "react-hook-form";
 import {useEffect, useState} from "react";
@@ -84,7 +100,7 @@ function EstateFilterComponent() {
     const [acquisitionStatus, setAcquisitionStatus] = useState<AcquisitionStatus>(AcquisitionStatus.ON_HOLD);
     const [filterSubmitted, setFilterSubmitted] = useState(false);
     const [page, setPage] = useState<number>(1);
-    const pageSize = 3;
+    const pageSize = 4;
     const [estateSearchFilter, setEstateSearchFilter] = useState<IEstateSearchFilter>();
     const [pageableEstateList, setPageableEstateList] = useState<Page<IEstate>>();
     const [loaded, setLoaded] = useState(false)
@@ -241,68 +257,73 @@ function EstateFilterComponent() {
 
 
     return (
-        <div className="container">
+        <div>
             <Dialog open={open}
                     onClose={handleClose}
                     maxWidth={false}
             >
-                <DialogTitle>Filter Estates</DialogTitle>
+
+                <DialogTitle justifyContent="center" alignItems="center" display="flex"><b>Filters</b></DialogTitle>
                 <DialogContent>
                     <FormGroup defaultValue="rounded" sx={{
                         alignItems: "center",
-                        margin: "5.5px"
+                        margin: "5.5px",
+
                     }}>
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"} spacing={1}>
 
                             <FormControl sx={{width: "100%"}}>
-                                <Box>
-                                    <AppBar position="static">
-                                        <Tabs
-                                            value={paymentTransactionType}
-                                            onChange={handleChange}
-                                            sx={{
-                                                backgroundColor: "white",
-                                            }}
-                                            variant="fullWidth"
 
-                                        >
-                                            <Tab
-                                                label="SALE" {...PaymentTransactionTypeIndex(PaymentTransactionType.SALE)} />
-                                            <Tab
-                                                label="RENT" {...PaymentTransactionTypeIndex(PaymentTransactionType.RENT)} />
-                                            <Tab
-                                                label="LEASE" {...PaymentTransactionTypeIndex(PaymentTransactionType.LEASE)} />
-                                        </Tabs>
-                                    </AppBar>
-                                </Box>
+                                <AppBar position="static" sx={{boxShadow: "none"}}>
+                                    <Tabs
+                                        value={paymentTransactionType}
+                                        onChange={handleChange}
+                                        sx={{
+                                            backgroundColor: "white"
+                                        }}
+                                        variant="fullWidth"
+                                    >
+                                        <Tab
+                                            label="SALE" {...PaymentTransactionTypeIndex(PaymentTransactionType.SALE)} />
+                                        <Tab
+                                            label="RENT" {...PaymentTransactionTypeIndex(PaymentTransactionType.RENT)} />
+                                        <Tab
+                                            label="LEASE" {...PaymentTransactionTypeIndex(PaymentTransactionType.LEASE)} />
+                                    </Tabs>
+                                </AppBar>
                             </FormControl>
                         </Grid>
 
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"} spacing={1}>
                             <FormControl sx={{width: "100%", marginTop: "2px"}}>
-                                <Box>
-                                    <AppBar position="static">
-                                        <Tabs
-                                            value={acquisitionStatus}
-                                            onChange={handleChangeAcquisitionStatus}
-                                            sx={{
-                                                backgroundColor: "white",
-                                            }}
-                                            variant="fullWidth"
-                                            aria-label="full width tabs example"
 
-                                        >
-                                            <Tab label="OPEN" {...AcquisitionStatusIndex(AcquisitionStatus.OPEN)} />
-                                            <Tab
-                                                label="ON-HOLD" {...AcquisitionStatusIndex(AcquisitionStatus.ON_HOLD)} />
-                                        </Tabs>
-                                    </AppBar>
-                                </Box>
+                                <AppBar position="static" sx={{boxShadow: "none"}}>
+                                    <Tabs
+                                        value={acquisitionStatus}
+                                        onChange={handleChangeAcquisitionStatus}
+                                        sx={{
+                                            backgroundColor: "white",
+                                        }}
+                                        variant="fullWidth"
+                                        aria-label="full width tabs example"
+
+                                    >
+                                        <Tab label="OPEN" {...AcquisitionStatusIndex(AcquisitionStatus.OPEN)} />
+                                        <Tab
+                                            label="ON-HOLD" {...AcquisitionStatusIndex(AcquisitionStatus.ON_HOLD)} />
+                                    </Tabs>
+                                </AppBar>
+
                             </FormControl>
                         </Grid>
 
-
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginTop: "1px",
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('squareMetersFrom')} id="squareMetersFrom"
@@ -319,7 +340,13 @@ function EstateFilterComponent() {
                             </Grid>
                         </Grid>
 
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginTop: "1px",
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('numberOfRoomsFrom')} id="numberOfRoomsFrom"
@@ -336,7 +363,13 @@ function EstateFilterComponent() {
                             </Grid>
                         </Grid>
 
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginTop: "1px",
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('numberOfBathroomsFrom')} id="numberOfBathroomsFrom"
@@ -350,7 +383,13 @@ function EstateFilterComponent() {
                                 </FormControl>
                             </Grid>
                         </Grid>
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginTop: "1px",
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('numberOfGaragesFrom')} id="numberOfGaragesFrom"
@@ -364,7 +403,13 @@ function EstateFilterComponent() {
                                 </FormControl>
                             </Grid>
                         </Grid>
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginTop: "1px",
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('yearOfConstructionFrom')} id="yearOfConstructionFrom"
@@ -380,7 +425,13 @@ function EstateFilterComponent() {
                             </Grid>
                         </Grid>
 
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginTop: "1px",
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('priceFrom')} defaultValue={0} id="priceFrom"
@@ -401,7 +452,6 @@ function EstateFilterComponent() {
                                 color: "black",
                                 fontWeight: "bolder",
                                 m: 0.50,
-                                // width: '100%',
                                 borderRadius: 2
                             }} onClick={handleOpenModalForTypeOfEstate}>Choose type of estate</Button>
                             <Modal
@@ -415,94 +465,153 @@ function EstateFilterComponent() {
                                     top: '50%',
                                     left: '50%',
                                     transform: 'translate(-50%, -50%)',
-                                    width: 500,
+                                    width: 700,
                                     bgcolor: 'white',
                                     borderRadius: '10px',
                                     boxShadow: 24,
                                     p: 4,
                                 }}>
-                                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                                        Property Type
+                                    <Typography id="modal-modal-title" variant="h6" component="h2"
+                                                justifyContent="center" alignItems="center" display="flex"
+                                                marginBottom="10px">
+                                        <b>Property Type</b>
                                     </Typography>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={MAGAZINE} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.MAGAZINE}/>
-                                    } label={TypeOfEstate.MAGAZINE}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={RESTAURANT} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.RESTAURANT}/>
-                                    } label={TypeOfEstate.RESTAURANT}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={CAFE} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.CAFE}/>
-                                    } label={TypeOfEstate.CAFE}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={HOTEL} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.HOTEL}/>
-                                    } label={TypeOfEstate.HOTEL}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={SALON} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.SALON}/>
-                                    } label={TypeOfEstate.SALON}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={OFFICE} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.OFFICE}/>
-                                    } label={TypeOfEstate.OFFICE}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={STUDIO} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.STUDIO}/>
-                                    } label={TypeOfEstate.STUDIO}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={PENTHOUSE} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.PENTHOUSE}/>
-                                    } label={TypeOfEstate.PENTHOUSE}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={LOFT} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.LOFT}/>
-                                    } label={TypeOfEstate.LOFT}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={CONDO} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.CONDO}/>
-                                    } label={TypeOfEstate.CONDO}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={RAILROAD} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.RAILROAD}/>
-                                    } label={TypeOfEstate.RAILROAD}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={WING} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.WING}/>
-                                    } label={TypeOfEstate.WING}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={GARDEN} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.GARDEN}/>
-                                    } label={TypeOfEstate.GARDEN}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={BARN} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.BARN}/>
-                                    } label={TypeOfEstate.BARN}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={BUNGALOW} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.BUNGALOW}/>
-                                    } label={TypeOfEstate.BUNGALOW}/>
-                                    <FormControlLabel control={
-                                        <Checkbox checked={CABIN} onChange={handleStateOfTypeOfEstateChange}
-                                                  name={TypeOfEstate.CABIN}/>
-                                    } label={TypeOfEstate.CABIN}/><FormControlLabel control={
-                                    <Checkbox checked={SINGLE_FAMILY} onChange={handleStateOfTypeOfEstateChange}
-                                              name={TypeOfEstate.SINGLE_FAMILY}/>
-                                } label={TypeOfEstate.SINGLE_FAMILY}/><FormControlLabel control={
-                                    <Checkbox checked={TOWNHOUSE} onChange={handleStateOfTypeOfEstateChange}
-                                              name={TypeOfEstate.TOWNHOUSE}/>
-                                } label={TypeOfEstate.TOWNHOUSE}/><FormControlLabel control={
-                                    <Checkbox checked={MULTI_FAMILY} onChange={handleStateOfTypeOfEstateChange}
-                                              name={TypeOfEstate.MULTI_FAMILY}/>
-                                } label={TypeOfEstate.MULTI_FAMILY}/><FormControlLabel control={
-                                    <Checkbox checked={MODULAR_HOME} onChange={handleStateOfTypeOfEstateChange}
-                                              name={TypeOfEstate.MODULAR_HOME}/>
-                                } label={TypeOfEstate.MODULAR_HOME}/><FormControlLabel control={
-                                    <Checkbox checked={RANCH_HOME} onChange={handleStateOfTypeOfEstateChange}
-                                              name={TypeOfEstate.RANCH_HOME}/>
-                                } label={TypeOfEstate.RANCH_HOME}/>
+                                    <Divider/>
+                                    <Grid container
+                                          sx={{
+                                              marginBottom: "1px",
+                                          }}
+                                          spacing={12}
+                                    >
+                                        <Grid item xs={6}>
+                                            <FormGroup>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={MAGAZINE}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.MAGAZINE}/>
+                                                } label={TypeOfEstate.MAGAZINE}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={RESTAURANT}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.RESTAURANT}/>
+                                                } label={TypeOfEstate.RESTAURANT}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={CAFE}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.CAFE}/>
+                                                } label={TypeOfEstate.CAFE}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={HOTEL}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.HOTEL}/>
+                                                } label={TypeOfEstate.HOTEL}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={SALON}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.SALON}/>
+                                                } label={TypeOfEstate.SALON}/>
+                                            </FormGroup>
+                                        </Grid>
+
+                                        <Grid item xs={6}>
+                                            <FormGroup>
+
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={SINGLE_FAMILY}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.SINGLE_FAMILY}/>
+                                                } label={TypeOfEstate.SINGLE_FAMILY}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={TOWNHOUSE}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.TOWNHOUSE}/>
+                                                } label={TypeOfEstate.TOWNHOUSE}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={MULTI_FAMILY}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.MULTI_FAMILY}/>
+                                                } label={TypeOfEstate.MULTI_FAMILY}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={MODULAR_HOME}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.MODULAR_HOME}/>
+                                                } label={TypeOfEstate.MODULAR_HOME}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={RANCH_HOME}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.RANCH_HOME}/>
+                                                } label={TypeOfEstate.RANCH_HOME}/>
+                                            </FormGroup>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container
+                                          sx={{
+                                              marginBottom: "1px",
+                                          }}
+                                          spacing={12}
+                                    >
+                                        <Grid item xs={6}>
+                                            <FormGroup>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={RAILROAD}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.RAILROAD}/>
+                                                } label={TypeOfEstate.RAILROAD}/>
+
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={OFFICE}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.OFFICE}/>
+                                                } label={TypeOfEstate.OFFICE}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={STUDIO}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.STUDIO}/>
+                                                } label={TypeOfEstate.STUDIO}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={PENTHOUSE}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.PENTHOUSE}/>
+                                                } label={TypeOfEstate.PENTHOUSE}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={LOFT} onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.LOFT}/>
+                                                } label={TypeOfEstate.LOFT}/>
+                                            </FormGroup>
+                                        </Grid>
+
+                                        <Grid item xs={6}>
+                                            <FormGroup>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={CONDO} onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.CONDO}/>
+                                                } label={TypeOfEstate.CONDO}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={WING} onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.WING}/>
+                                                } label={TypeOfEstate.WING}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={GARDEN}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.GARDEN}/>
+                                                } label={TypeOfEstate.GARDEN}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={BARN} onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.BARN}/>
+                                                } label={TypeOfEstate.BARN}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={BUNGALOW}
+                                                              onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.BUNGALOW}/>
+                                                } label={TypeOfEstate.BUNGALOW}/>
+                                                <FormControlLabel control={
+                                                    <Checkbox checked={CABIN} onChange={handleStateOfTypeOfEstateChange}
+                                                              name={TypeOfEstate.CABIN}/>
+                                                } label={TypeOfEstate.CABIN}/>
+                                            </FormGroup>
+                                        </Grid>
+                                    </Grid>
+
 
                                     <Button sx={{
                                         background: "#F1F1F1",
@@ -516,7 +625,12 @@ function EstateFilterComponent() {
                             </Modal>
                         </FormControl>
 
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"}>
+                        <Grid container
+                              sx={{
+                                  marginBottom: "1px"
+                              }}
+                              spacing={1}
+                        >
                             <Grid item xs={6}>
                                 <FormControl>
                                     <TextField {...register('city')} defaultValue={null} id="city" label="city"
@@ -535,14 +649,17 @@ function EstateFilterComponent() {
                     </FormGroup>
                 </DialogContent>
                 <DialogActions>
+
                     <Button sx={{
                         background: "#F1F1F1",
                         color: "black",
                         fontWeight: "bolder",
-                        m: 0.50,
-                        width: '25%',
+                        justifyContent: "right",
+                        alignItems: "right",
+                        display: "flex",
                         borderRadius: 2
                     }} onClick={onSubmit}>Search</Button>
+
                 </DialogActions>
             </Dialog>
             {pageableEstateList ?
@@ -555,13 +672,14 @@ function EstateFilterComponent() {
             {
                 filterSubmitted ?
                     <>
-                        <Box justifyContent={"right"} alignItems={"right"} display={"flex"}>
-                            <Pagination sx={{
-                                flexGrow: 1,
-                                mr: 3,
-                                mt: 1,
-                            }} size="medium" count={getPageNumber()} page={page} onChange={handlePageChange}
-                                        variant="outlined"/>
+                        <Box justifyContent={"right"} alignItems={"right"} display={"flex"} className="container">
+                            <Pagination
+                                sx={{
+                                    flexGrow: 1,
+                                    mr: 3,
+                                    mt: 1,
+                                }} size="medium" count={getPageNumber()} page={page} onChange={handlePageChange}
+                                variant="outlined"/>
 
                             <Button
                                 sx={{
@@ -581,13 +699,17 @@ function EstateFilterComponent() {
 
                     :
                     <>
-                        <Box justifyContent={"center"} alignItems={"center"} display={"flex"} mt="2%">
-                            <Card sx={{maxWidth: "100%", maxHeight: "100%", borderRadius: "20px"}}>
+                        <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
+                            <Card sx={{
+                                // width: "1000px", maxHeight: "667px"
+                            }}>
+
+
                                 <Box sx={{position: 'relative'}}>
                                     <CardMedia
                                         component="img"
                                         image={homeImage}
-
+                                        width="100%"
                                     />
                                     <ThemeProvider theme={theme}>
                                         <Typography variant="h5" style={{
@@ -618,27 +740,30 @@ function EstateFilterComponent() {
                                         <img src={filterIcon}/>Filter
                                     </Button>
                                 </Box>
+
+
                             </Card>
                         </Box>
 
 
-                        <div className="container">
-                            <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
-                                <Typography variant="h5" style={{
-                                    fontFamily: 'Arial',
-                                    fontWeight: "bold",
-                                    margin: "10px"
-                                }}>
-                                    Recently added estates
-                                </Typography>
-                            </Box>
-                            {
-                                latestEstates ?
-                                    <EstatesList estates={latestEstates} page={1} pageSize={10}/>
-                                    : <></>
-                            }
+                        {
 
-                        </div>
+                            latestEstates ?
+                                <>
+                                    <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
+                                        <Typography variant="h5" style={{
+                                            fontFamily: 'Arial',
+                                            fontWeight: "bold",
+                                            margin: "10px"
+                                        }}>
+                                            Recently added estates
+                                        </Typography>
+                                    </Box>
+                                    <EstatesList  estates={latestEstates} page={1} pageSize={10}/>
+                                </> : <></>
+                        }
+
+
                     </>
             }
 

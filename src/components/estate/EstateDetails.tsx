@@ -30,6 +30,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import ReportService from "../../services/report.service";
 import CloseIcon from '@mui/icons-material/Close';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import {routes} from "../../config/routes";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -183,14 +184,19 @@ function EstateDetails() {
                     <b>{estate?.city}, {estate?.country}</b>
                 </Grid>
                 <Grid item xs={6} md={8}>
-                    <ImageList sx={{width: "100%", height: 200}} cols={4} rowHeight={164}>
+                    <ImageList sx={{
+                        display: "flex"}} cols={4} rowHeight={164}>
                         {estate?.estatePhotos.map((photo: string) => {
                             if (photo) return (
                                 <ImageListItem key={photo}>
-                                    <img className="img-fluid" src={photo}/>
+                                    <img className="img-fluid" style={{
+                                        height: "200px",
+                                        verticalAlign: "middle",
+                                        flex: 1.3345,
+                                    }} src={routes.STATIC_CONTENT_URL+photo}/>
                                 </ImageListItem>
                             )
-                            else return (<img className="img-fluid" src="/estate/noEstate.png"/>)
+                            else return (<img className="img-fluid" src={routes.STATIC_CONTENT_URL + "/estate/noEstate.png"}/>)
                         })}
                         <></>
                     </ImageList>

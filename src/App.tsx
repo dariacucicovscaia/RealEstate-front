@@ -16,8 +16,10 @@ import AppointmentConfirmationPage from "./pages/AppointmentConfirmationPage";
 import DynamicAppProperties from "./pages/DynamicAppProperties";
 import ProfilePage from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import EditProfile from "./pages/EditProfile";
+import EditProfile from "./components/EditProfile";
 import CreateEstateForm from "./components/multistep/CreateEstateForm";
+import Registration from "./pages/Registration";
+import NewArticleForm from "./components/news/NewArticleForm";
 
 class App extends Component {
     render() {
@@ -27,10 +29,10 @@ class App extends Component {
                     <Routes>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/" element={<EstateFilterComponent/>}/>
+                        <Route path="/register" element={<Registration/>}/>
                         <Route path="/appointments" element={
                             <RequireAuth loginPath="/login">
                                 <AllUsersAppointments/>
-
                             </RequireAuth>}
                         />
                         <Route path="/editProfile" element={
@@ -45,10 +47,12 @@ class App extends Component {
                             <Route path="/adminPanel" element={<AdminPanel/>}/>
                             <Route path="/dynamic-app-props" element={<DynamicAppProperties/>}/>
                         </Route>
+                        {/*<Route element={<AuthRoute allowedRoles={["AUTHOR"]}/>}>*/}
+                            <Route path="/create-new-article" element={<NewArticleForm/>}/>
+                        {/*</Route>*/}
                         <Route element={<AuthRoute allowedRoles={["USER"]}/>}>
                             <Route path="/myAppointments" element={<AllUsersAppointments/>}/>
                             <Route path="/profile" element={<ProfilePage/>}/>
-                            {/*<Route path="/registerEstate" element={<EstateRegistration/>}/>*/}
                             <Route path="/registerEstate" element={<CreateEstateForm/>}/>
                             <Route path="/allMyEstates" element={<OwnerEstates/>}/>
                         </Route>

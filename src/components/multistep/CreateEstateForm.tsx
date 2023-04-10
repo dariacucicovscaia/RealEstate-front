@@ -7,11 +7,11 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import Button from "@mui/material/Button";
 import {useAuthHeader, useAuthUser} from "react-auth-kit";
 import EstateService from "../../services/estate.service";
 
-
+import CloseIcon from '@mui/icons-material/Close';
+import {routes} from "../../config/routes";
 // @ts-ignore
 export const FormContext = createContext();
 
@@ -26,14 +26,17 @@ function CreateEstateForm() {
     const authHeader = useAuthHeader();
     const user = useAuthUser();
 
+
     function handleFileUpload() {
         const data = new FormData();
+
         if (files) {
             files.forEach((file, i) => {
                 data.append(`file${i}`, file, file.name);
             });
-
-            axios.post('http://localhost:5000/estateUpload', data, {
+            const ownerEmail = user()?.email.substring(0, user()?.email.lastIndexOf("@"))
+            data.append("estateOwner", ownerEmail)
+            axios.post(routes.STATIC_CONTENT_URL + '/estateUpload', data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -61,18 +64,20 @@ function CreateEstateForm() {
     };
 
 
-    useEffect(()=>{
+    useEffect(() => {
         const email = user()?.email;
         console.log(email)
         setFormData({
-            "email":email
+            "email": email
         })
     }, [done])
     useEffect(() => {
         if (activeStepIndex === 5) {
             // @ts-ignore
             EstateService.createEstateWithAllDetails(formData, authHeader())
-                .then(res => {console.log(res.data)})
+                .then(res => {
+                    console.log(res.data)
+                })
 
             setFormSubmitted(true)
         }
@@ -105,11 +110,11 @@ function CreateEstateForm() {
                 variant="h4"
                 gutterBottom
                 color="primary"
-                style={{padding: "0 8px"}}
+                style={{padding: "0 8px", marginLeft: "10px", marginTop: "10px"}}
             >
                 Register estate
             </Typography>
-            <Typography gutterBottom>
+            <Typography gutterBottom style={{marginLeft: "10px"}}>
                 This information will be displayed in the estates for sale
             </Typography>
             <Box sx={{width: '90%', margin: "5%"}}>
@@ -131,22 +136,16 @@ function CreateEstateForm() {
 
             <MyStep/>
             <Dialog open={formSubmitted} sx={{mb: 2}}>
+                <Box sx={{
+                    justifyContent: "right",
+                    alignItems: "right",
+                    margin: "10px",
+                    display: "flex"
+                }}>
+                    <CloseIcon onClick={() => setDone(true)}/>
+                </Box>
                 <DialogContent>
                     Estate was <strong>successfully registered</strong>, close to view all your estates
-
-                    <Button
-                        sx={{
-                            background: "#F1F1F1",
-                            color: "black",
-                            fontWeight: "bolder",
-                            m: 0.50,
-                            borderRadius: '10px',
-                            width: '48%'
-                        }}
-                        onClick={() => setDone(true)}
-                    >
-                        close
-                    </Button>
                 </DialogContent>
             </Dialog>
         </FormContext.Provider>

@@ -1,5 +1,5 @@
 import {Dayjs} from "dayjs";
-import http from "../http-common";
+import http from "../config/http-common";
 
 class ReportService {
     async generateReport(start: Dayjs , end: Dayjs, estateId: number, authHeader: string) {

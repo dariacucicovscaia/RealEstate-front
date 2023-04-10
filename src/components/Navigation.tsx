@@ -20,8 +20,9 @@ import {AccountCircle, EditOutlined, LogoutOutlined, PersonOutline} from "@mui/i
 import UserService from "../services/user.service";
 import {Avatar, CardContent, Grid, ListItemIcon, ListItemText, Menu, Stack} from "@mui/material";
 import AdminPanelFullUser from "../types/AdminPanelFullUser";
-import EditProfile from "../pages/EditProfile";
+import EditProfile from "./EditProfile";
 import Dialog from "@mui/material/Dialog";
+import {routes} from "../config/routes";
 
 const DrawerHeader = styled('div')(() => ({
     display: 'flex',
@@ -66,17 +67,16 @@ function ResponsiveAppBar() {
     }, [])
 
     return (<>
-            <AppBar position="static" sx={{
+            <AppBar position="static"
+                    sx={{
                 background: "white",
-            }}>
+            }}
+            >
                 <Drawer
-
                     variant="persistent"
                     anchor="left"
                     open={open}
-                    onClose={(_, reason) =>
-                        reason === 'backdropClick' && setOpen(false)
-                    }
+                    onClose={handleDrawerClose}
                 >
                     <DrawerHeader>
                         <IconButton onClick={handleDrawerClose}>
@@ -90,7 +90,7 @@ function ResponsiveAppBar() {
                                     return (
                                         <>
                                             <ListItemButton
-                                                key={role}
+                                                key="myAppointments"
                                                 sx={{
                                                     mr: 2,
                                                     color: 'black',
@@ -104,7 +104,7 @@ function ResponsiveAppBar() {
                                                 Appointments
                                             </ListItemButton>
                                             <ListItemButton
-                                                key={role}
+                                                key="registerEstate"
                                                 sx={{
                                                     mr: 2,
                                                     color: 'black',
@@ -118,7 +118,7 @@ function ResponsiveAppBar() {
                                                 Add property
                                             </ListItemButton>
                                             <ListItemButton
-                                                key={role}
+                                                key="allMyEstates"
                                                 sx={{
                                                     mr: 2,
                                                     color: 'black',
@@ -132,7 +132,7 @@ function ResponsiveAppBar() {
                                                 All my estates
                                             </ListItemButton>
                                             <ListItemButton
-                                                key={role}
+                                                key="profile"
                                                 sx={{
                                                     mr: 2,
                                                     color: 'black',
@@ -149,12 +149,33 @@ function ResponsiveAppBar() {
                                         </>
                                     )
                                 }
+                                //todo change role to author
+                                if (role === 'ADMIN') {
+                                    return (<>
+                                            <Divider></Divider>
+                                            <ListItemButton
+                                                key="create-new-article"
+                                                sx={{
+                                                    mr: 2,
+                                                    color: 'black',
+                                                    fontWeight: "bolder",
+                                                    width: "100%",
+                                                    background: "white",
+                                                    borderRadius: "8px"
+                                                }}
+                                                href="/create-new-article"
+                                            >
+                                                Add New Article
+                                            </ListItemButton>
+                                        </>
+                                    )
+                                }
 
                                 if (role === 'ADMIN') {
                                     return (<>
                                             <Divider></Divider>
                                             <ListItemButton
-                                                key={role}
+                                                key="/adminPanel"
                                                 sx={{
                                                     mr: 2,
                                                     color: 'black',
@@ -166,20 +187,22 @@ function ResponsiveAppBar() {
                                                 href="/adminPanel"
                                             >
                                                 Admin Panel
-                                            </ListItemButton> <ListItemButton
-                                            key={role}
-                                            sx={{
-                                                mr: 2,
-                                                color: 'black',
-                                                fontWeight: "bolder",
-                                                width: "100%",
-                                                background: "white",
-                                                borderRadius: "8px"
-                                            }}
-                                            href="/dynamic-app-props"
-                                        >
-                                            Dynamic Configurations
-                                        </ListItemButton></>
+                                            </ListItemButton>
+                                            <ListItemButton
+                                                key="/dynamic-app-props"
+                                                sx={{
+                                                    mr: 2,
+                                                    color: 'black',
+                                                    fontWeight: "bolder",
+                                                    width: "100%",
+                                                    background: "white",
+                                                    borderRadius: "8px"
+                                                }}
+                                                href="/dynamic-app-props"
+                                            >
+                                                Dynamic Configurations
+                                            </ListItemButton>
+                                        </>
                                     )
                                 }
 
@@ -199,7 +222,7 @@ function ResponsiveAppBar() {
                                                      flexGrow: 1,
                                                  }}>
                                                 <IconButton
-                                                    key={role}
+
                                                     size="large"
                                                     edge="start"
                                                     aria-label="menu"
@@ -245,7 +268,8 @@ function ResponsiveAppBar() {
                                         <Stack direction="row" alignItems="center">
                                             {
                                                 user?.profilePicture ?
-                                                    <Avatar alt="Remy Sharp" sx={{mr: 1}} src={user?.profilePicture}/>
+                                                    <Avatar alt="Remy Sharp" sx={{mr: 1}}
+                                                            src={routes.STATIC_CONTENT_URL + user?.profilePicture}/>
                                                     :
                                                     <AccountCircle sx={{
                                                         color: "gray",
@@ -279,7 +303,8 @@ function ResponsiveAppBar() {
                                                 <Stack direction="row" spacing={1.25} alignItems="center">
                                                     {
                                                         user?.profilePicture ?
-                                                            <Avatar alt="Remy Sharp" src={user?.profilePicture}/>
+                                                            <Avatar alt="Remy Sharp"
+                                                                    src={routes.STATIC_CONTENT_URL + user?.profilePicture}/>
                                                             :
                                                             <AccountCircle sx={{
                                                                 color: "gray",
@@ -375,12 +400,12 @@ function ResponsiveAppBar() {
                 </Container>
             </AppBar>
             <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
-            <Dialog open={popoverEditUser} onClose={handleCloseEditUser}>
-                <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
-                    <EditProfile/>
-                </Box>
-
-            </Dialog></Box>
+                <Dialog open={popoverEditUser} onClose={handleCloseEditUser}>
+                    <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
+                        <EditProfile/>
+                    </Box>
+                </Dialog>
+            </Box>
         </>
     )
         ;

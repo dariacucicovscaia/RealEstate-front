@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {useForm} from "react-hook-form";
 import UserService from "../services/user.service";
 import User from "../types/User";
 import {
@@ -14,10 +13,8 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {useNavigate} from "react-router-dom";
-// third party
 import * as Yup from 'yup';
 import {Formik} from 'formik';
-import IconButton from "@mui/material/IconButton";
 
 type RegistrationDTO = {
     email: string
@@ -31,7 +28,6 @@ type RegistrationDTO = {
 }
 
 function Registration() {
-    const {register, handleSubmit} = useForm<RegistrationDTO>();
     const [user, setUser] = useState<User>();
     const navigate = useNavigate();
     const rePhoneNumber = /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/;
@@ -110,7 +106,7 @@ function Registration() {
                         }}
                     >
                         {({errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values}) => (
-                            <form noValidate onSubmit={handleSubmit}>
+                            <form noValidate autoComplete="off"  onSubmit={handleSubmit}>
                                 <Grid container spacing={3}>
                                     <Grid item xs={12} md={6}>
                                         <Stack spacing={1}>
@@ -157,6 +153,7 @@ function Registration() {
                                     <Grid item xs={12} md={4}>
                                         <Stack spacing={1}>
                                             <TextField
+                                                autoComplete="off"
                                                 id="fullAddress-signup"
                                                 value={values.fullAddress}
                                                 name="fullAddress"
@@ -259,7 +256,8 @@ function Registration() {
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Stack spacing={1}>
-                                            <FormControl>  <TextField
+                                            <FormControl>
+                                                <TextField
                                                 id="password-signup"
                                                 type='password'
                                                 value={values.password}
@@ -278,6 +276,22 @@ function Registration() {
                                                     {errors.password}
                                                 </FormHelperText>
                                             )}
+                                            </FormControl>
+                                        </Stack>
+                                        <Stack spacing={1}  sx={{mt: 2}}>
+                                            <FormControl>
+                                                <TextField
+                                                id="repeat-signup"
+                                                type='password'
+                                                name="repeat"
+                                                label="confirm password"
+                                                onBlur={handleBlur}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                }}
+                                                placeholder="******"
+                                               fullWidth
+                                            />
                                             </FormControl>
                                         </Stack>
 
@@ -307,7 +321,7 @@ function Registration() {
                                                 color: "white",
                                                 fontWeight: "bolder",
                                                 m: 0.50,
-                                                width: '25%',
+                                                width: '35%',
                                                 borderRadius: 2
                                             }}>
                                             Create Account

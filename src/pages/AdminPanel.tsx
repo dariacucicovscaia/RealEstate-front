@@ -7,7 +7,7 @@ import AdminPanelFullUser from "../types/AdminPanelFullUser";
 import {Pagination, Switch} from "@mui/material";
 import Box from "@mui/material/Box";
 import searchIcon from "../assets/icons/search.svg"
-import {useNavigate} from "react-router-dom";
+import {routes} from "../config/routes";
 
 function AdminPanel() {
     const [users, setUsers] = useState<Page<AdminPanelFullUser>>()
@@ -41,12 +41,6 @@ function AdminPanel() {
         setPage(page);
     };
 
-    const getPhotoPath = (path: string) => {
-        if (path === null) {
-            return "/profileImg/nouser.png"
-        } else
-            return path;
-    }
 
     useEffect(() => {
             UserService.getAllUsers(criteria, pageSize, page, authHeader()).then(res => {
@@ -101,8 +95,15 @@ function AdminPanel() {
                                         <tbody key={result.id}>
                                         <tr>
                                             <td>{result.id}</td>
-                                            <td><img className="img-thumbnail" src={getPhotoPath(result.profilePicture)}
-                                                     height="50px" width="100px"/></td>
+                                            <td>{
+                                                result.profilePicture?
+                                                     <img className="img-thumbnail" src={routes.STATIC_CONTENT_URL + result.profilePicture}
+                                                               height="50px" width="100px"/>
+                                                    : <img className="img-thumbnail" src={routes.STATIC_CONTENT_URL +"/profileImg/noUser.png"}
+                                                           height="50px" width="100px"/>
+                                            }
+
+                                            </td>
                                             <td>{result.firstName}</td>
                                             <td>{result.lastName}</td>
                                             <td>{result.email}</td>
@@ -128,19 +129,6 @@ function AdminPanel() {
                             mt: 1,
                         }} size="large" count={getPageNumber()} page={page} onChange={handleChange}
                                     variant="outlined"/>
-                        {/*<Button*/}
-                    {/*        sx={{*/}
-                    {/*            background: "#F1F1F1",*/}
-                    {/*            color: "black",*/}
-                    {/*            fontWeight: "bolder",*/}
-                    {/*            mt: 0.50,*/}
-                    {/*            borderRadius: '10px',*/}
-                    {/*            width: '26.5%'*/}
-                    {/*        }}*/}
-                    {/*        onClick={() => navigate("/dynamic-app-props")}*/}
-                    {/*    >*/}
-                    {/*        <img src={filterIcon}/>system properties*/}
-                    {/*    </Button>*/}
                     </Box>
 
                 </div>

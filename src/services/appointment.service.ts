@@ -1,5 +1,5 @@
 import Appointment from "../types/Appointment";
-import http from "../http-common";
+import http from "../config/http-common";
 import Page from "../types/Page";
 import {Dayjs} from "dayjs";
 import AppointmentDTO from "../types/AppointmentDTO";

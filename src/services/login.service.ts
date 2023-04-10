@@ -1,4 +1,4 @@
-import http from "../http-common";
+import http from "../config/http-common";
 import LoginDTO from "../types/LoginDTO";
 import IToken from "../types/IToken";
 

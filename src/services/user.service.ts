@@ -1,4 +1,4 @@
-import http from "../http-common";
+import http from "../config/http-common";
 import User from "../types/User";
 import AdminPanelFullUser from "../types/AdminPanelFullUser";
 import Page from "../types/Page";
@@ -50,7 +50,10 @@ class UserService {
         })
     }
     async addProfilePicture (profilePicture:string, userId:number, authHeader:string){
-        return await http.put<IProfile>(`api/v1/profile/addProfilePicture/${userId}/${profilePicture}`,{},{
+        return await http.put<IProfile>(`api/v1/profile/addProfilePicture/${userId}`,{},{
+            params: {
+                profilePicture: profilePicture
+            },
             headers: {
                 "Authorization": authHeader
             }

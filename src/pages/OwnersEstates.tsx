@@ -44,7 +44,7 @@ function OwnerEstates() {
     })
 
     return (
-        <div className="container">
+        <div>
 
             {estates ?
                 <div>
@@ -63,6 +63,7 @@ function OwnerEstates() {
                 :
                 <>no data</>}
         </div>
+
     )
 }
 

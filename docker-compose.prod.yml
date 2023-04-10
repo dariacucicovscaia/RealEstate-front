@@ -1,0 +1,8 @@
+version: "2.15.1"
+
+services:
+  frontend:
+    build:
+      target: production
+    ports:
+      - 81:80
