@@ -25,7 +25,6 @@ const ProfilePage = () => {
         // @ts-ignore
         hiddenFileInput.current.click();
     };
-
     // @ts-ignore
     const handleChange = (event) => {
         const fileUploaded = event.target.files[0];

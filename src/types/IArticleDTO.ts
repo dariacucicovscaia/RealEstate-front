@@ -1,9 +1,12 @@
-export default interface IArticleDTO{
+export default interface IArticleDTO {
+    id: number;
+    creationDate: string;
     title: string;
-    description :string;
-    content:string;
+    description: string;
+    content: string;
     firstName: string;
     lastName: string;
     externalId: number;
-    isPublished:boolean;
+    isPublished: boolean;
+    imagePath: string;
 }

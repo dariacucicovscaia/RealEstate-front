@@ -23,6 +23,7 @@ import AdminPanelFullUser from "../types/AdminPanelFullUser";
 import EditProfile from "./EditProfile";
 import Dialog from "@mui/material/Dialog";
 import {routes} from "../config/routes";
+import NewsService from "../services/news.service";
 
 const DrawerHeader = styled('div')(() => ({
     display: 'flex',
@@ -62,6 +63,7 @@ function ResponsiveAppBar() {
         UserService.getUserDetails(authUser()?.id, authHeader()).then(
             (resp) => {
                 setUser(resp.data);
+
             }
         )
     }, [])
@@ -149,8 +151,8 @@ function ResponsiveAppBar() {
                                         </>
                                     )
                                 }
-                                //todo change role to author
-                                if (role === 'ADMIN') {
+
+                                if (role === 'AUTHOR') {
                                     return (<>
                                             <Divider></Divider>
                                             <ListItemButton

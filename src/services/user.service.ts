@@ -60,6 +60,9 @@ class UserService {
         })
     }
 
+    async getProfilePictureOfAUser(userId: number) {
+        return await http.get<string>(`api/v1/profile/profilePicture/${userId}`);
+    }
 }
 
 export default new UserService();

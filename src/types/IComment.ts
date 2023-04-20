@@ -1,4 +1,4 @@
-import IUserNews from "./IArticle";
+import IUserNews from "./IUserNews";
 
 export default interface IComment{
     id: number;

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
+import Dialog, {DialogProps} from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -10,13 +10,15 @@ import {
     Card,
     CardMedia,
     Checkbox,
-    createTheme, Divider,
+    createTheme,
+    Divider,
     FormControl,
     FormControlLabel,
-    FormGroup,
+    FormGroup, FormLabel,
     Grid,
+    MenuItem,
     Modal,
-    Pagination,
+    Pagination, Select, SelectChangeEvent,
     Tab,
     Tabs,
     TextField,
@@ -32,17 +34,14 @@ import homeImage from "../assets/main.png";
 import EstateService from "../services/estate.service";
 import Page from "../types/Page";
 import IEstate from "../types/IEstate";
+import IArticle from "../types/IArticle";
+import ArticlesList from "../components/news/ArticlesList";
+import NewsService from "../services/news.service";
+import {Label} from "@mui/icons-material";
 
-enum AcquisitionStatus {
-    OPEN,
-    ON_HOLD
-}
+enum AcquisitionStatus {OPEN, ON_HOLD}
 
-enum PaymentTransactionType {
-    SALE,
-    RENT,
-    LEASE
-}
+enum PaymentTransactionType {SALE, RENT, LEASE}
 
 const theme = createTheme();
 theme.typography.h5 = {
@@ -70,32 +69,26 @@ function AcquisitionStatusIndex(index: AcquisitionStatus) {
 }
 
 enum TypeOfEstate {
-    MAGAZINE = "MAGAZINE",
-    RESTAURANT = "RESTAURANT",
-    CAFE = "CAFE",
-    HOTEL = "HOTEL",
-    SALON = "SALON",
-    OFFICE = "OFFICE",
-    STUDIO = "STUDIO",
-    PENTHOUSE = "PENTHOUSE",
-    LOFT = "LOFT",
-    CONDO = "CONDO",
-    RAILROAD = "RAILROAD",
-    WING = "WING",
-    GARDEN = "GARDEN",
-    BARN = "BARN",
-    BUNGALOW = "BUNGALOW",
-    CABIN = "CABIN",
-    SINGLE_FAMILY = "SINGLE_FAMILY",
-    TOWNHOUSE = "TOWNHOUSE",
-    MULTI_FAMILY = "MULTI_FAMILY",
-    MODULAR_HOME = "MODULAR_HOME",
-    RANCH_HOME = "RANCH_HOME"
+    MAGAZINE = "Magazine",
+    RESTAURANT = "Restaurant",
+    OFFICE = "Office",
+
+    STUDIO = "Studio",
+    PENTHOUSE = "Penthouse",
+    CONDO = "Condo",
+
+
+    CABIN = "Cabin",
+    SINGLE_FAMILY = "Single Family",
+    TOWNHOUSE = "Townhouse",
+    MULTI_FAMILY = "Multi Family",
+    RANCH_HOME = "Ranch"
 }
 
 function EstateFilterComponent() {
+    const [pageA, setPageA] = useState<number>(1);
+    const [articles, setArticles] = useState<Page<IArticle>>();
     const [open, setOpen] = useState(false);
-    const [openModalTypeOfEstate, setOpenModalTypeOfEstate] = useState(false);
     const [paymentTransactionType, setPaymentTransactionType] = useState<PaymentTransactionType>(PaymentTransactionType.SALE);
     const [acquisitionStatus, setAcquisitionStatus] = useState<AcquisitionStatus>(AcquisitionStatus.ON_HOLD);
     const [filterSubmitted, setFilterSubmitted] = useState(false);
@@ -106,50 +99,32 @@ function EstateFilterComponent() {
     const [loaded, setLoaded] = useState(false)
     const [latestEstates, setLatestEstates] = useState<Page<IEstate>>()
     const [state, setState] = useState({
+        ALL: false,
         MAGAZINE: false,
         RESTAURANT: false,
-        CAFE: false,
-        HOTEL: false,
-        SALON: false,
         OFFICE: false,
         STUDIO: false,
         PENTHOUSE: false,
-        LOFT: false,
         CONDO: false,
-        RAILROAD: false,
-        WING: false,
-        GARDEN: false,
-        BARN: false,
-        BUNGALOW: false,
         CABIN: false,
         SINGLE_FAMILY: false,
         TOWNHOUSE: false,
         MULTI_FAMILY: false,
-        MODULAR_HOME: false,
         RANCH_HOME: false,
     });
     const {
+        ALL,
         MAGAZINE,
         RESTAURANT,
-        CAFE,
-        HOTEL,
-        SALON,
         OFFICE,
         STUDIO,
         PENTHOUSE,
-        LOFT,
         CONDO,
-        RAILROAD,
-        WING,
-        GARDEN,
-        BARN,
-        BUNGALOW,
         CABIN,
         SINGLE_FAMILY,
         TOWNHOUSE,
         MULTI_FAMILY,
-        MODULAR_HOME,
-        RANCH_HOME,
+        RANCH_HOME
     } = state;
 
     useEffect(() => {
@@ -179,13 +154,13 @@ function EstateFilterComponent() {
 
             latestAdded: true
         }
-        EstateService.getAllEstatesByAllCriteria(searchFilter, 10, 1).then(res => {
+        EstateService.getAllEstatesByAllCriteria(searchFilter, 6, 1).then(res => {
             setLatestEstates(res.data);
         })
     }, [loaded])
 
 
-// @ts-ignore
+    // @ts-ignore
     const handlePageChange = (event, page) => {
         setPage(page);
     };
@@ -197,19 +172,86 @@ function EstateFilterComponent() {
         return nrOfPages;
     }
 
-    const {register, handleSubmit, setValue} = useForm<IEstateSearchFilter>();
+    const {register, handleSubmit, setValue} = useForm<IEstateSearchFilter>(
+        {
+            defaultValues: {
+                squareMetersFrom: 0,
+                squareMetersTo: 0,
+
+                numberOfRoomsFrom: 0,
+                numberOfRoomsTo: 0,
+
+                numberOfBathroomsFrom: 0,
+                numberOfBathroomsTo: 0,
+
+                numberOfGaragesFrom: 0,
+                numberOfGaragesTo: 0,
+
+                yearOfConstructionFrom: "",
+                yearOfConstructionTo: "",
+
+                typeOfEstates: [],
+
+                city: "",
+                country: "",
+
+                priceFrom: 0,
+                priceTo: 0,
+
+                latestAdded: true
+            }
+        }
+    );
 
     const handleChange = (event: React.SyntheticEvent, newValue: PaymentTransactionType) => {
         setPaymentTransactionType(newValue);
         setValue('paymentTransactionType', newValue)
     };
     const handleStateOfTypeOfEstateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
         console.log(event.target.name)
+        console.log(event.target.name === "ALL")
         console.log(event.target.checked)
-        setState({
-            ...state,
-            [event.target.name]: event.target.checked,
-        });
+
+        if(event.target.name === "ALL"){
+            if(event.target.checked){
+                setState({
+                    ALL: true,
+                    MAGAZINE: true,
+                    RESTAURANT: true,
+                    OFFICE: true,
+                    STUDIO: true,
+                    PENTHOUSE: true,
+                    CONDO: true,
+                    CABIN: true,
+                    SINGLE_FAMILY: true,
+                    TOWNHOUSE: true,
+                    MULTI_FAMILY: true,
+                    RANCH_HOME: true,
+                })
+            }else{
+                setState({
+                    ALL: false,
+                    MAGAZINE: false,
+                    RESTAURANT: false,
+                    OFFICE: false,
+                    STUDIO: false,
+                    PENTHOUSE: false,
+                    CONDO: false,
+                    CABIN: false,
+                    SINGLE_FAMILY: false,
+                    TOWNHOUSE: false,
+                    MULTI_FAMILY: false,
+                    RANCH_HOME: false,
+                })
+            }
+        }else{
+            setState({
+                ...state,
+                [event.target.name]: event.target.checked,
+            });
+        }
+
     };
 
 
@@ -221,23 +263,12 @@ function EstateFilterComponent() {
     const handleClickOpen = () => {
         setOpen(true);
     };
-    const handleOpenModalForTypeOfEstate = () => {
-        setOpenModalTypeOfEstate(true);
-    };
+
 
     const handleClose = () => {
         setOpen(false);
     };
-    const handleCloseModalTypesOfEstate = () => {
-        console.log(state)
 
-        // @ts-ignore
-        const keys = Object.keys(state).filter(k => state[k]);
-
-        console.log(keys)
-        setValue('typeOfEstates', keys)
-        setOpenModalTypeOfEstate(false);
-    };
     const onSubmit = handleSubmit((data) => {
         console.log(data)
         setEstateSearchFilter(data)
@@ -245,8 +276,14 @@ function EstateFilterComponent() {
         handleClose()
 
     })
-
-
+    useEffect(() => {
+        NewsService.getAllArticlesPaginated(pageA, 8).then(
+            resp => {
+                setArticles(resp.data)
+                console.log(resp.data)
+            }
+        )
+    }, [pageA])
     useEffect(() => {
         if (estateSearchFilter)
             EstateService.getAllEstatesByAllCriteria(estateSearchFilter, pageSize, page).then(res => {
@@ -256,22 +293,72 @@ function EstateFilterComponent() {
     }, [estateSearchFilter, page])
 
 
+    // useEffect(() => {
+    //     console.log("state of all has been changed")
+    //
+    //     if (state.ALL) {
+    //         setState({
+    //             ALL: true,
+    //             MAGAZINE: true,
+    //             RESTAURANT: true,
+    //             OFFICE: true,
+    //             STUDIO: true,
+    //             PENTHOUSE: true,
+    //             CONDO: true,
+    //             CABIN: true,
+    //             SINGLE_FAMILY: true,
+    //             TOWNHOUSE: true,
+    //             MULTI_FAMILY: true,
+    //             RANCH_HOME: true,
+    //         })
+    //         setValue('typeOfEstates', [])
+    //     }
+    //
+    //
+    // }, [setValue, state.ALL])
+
+    const handleCheckAll = () => {
+
+
+    }
+
+    useEffect(() => {
+        state.ALL = false
+        console.log(state.ALL)
+        // @ts-ignore
+        const keys = Object.keys(state).filter(k => state[k]);
+
+        console.log(keys)
+
+        setValue('typeOfEstates', keys)
+    }, [state] )
+
+
+    const priceFrom = register('priceFrom')
+    const priceTo = register('priceTo')
+    const numberOfRoomsFrom = register('numberOfRoomsFrom')
+    const numberOfRoomsTo = register('numberOfRoomsTo')
+    const squareMetersFrom = register('squareMetersFrom')
+    const squareMetersTo = register('squareMetersTo')
+    const garagesFrom = register('numberOfGaragesFrom')
+    const [fullWidth, setFullWidth] = React.useState(true);
+    const [maxWidth, setMaxWidth] = React.useState<DialogProps['maxWidth']>('lg');
     return (
         <div>
             <Dialog open={open}
                     onClose={handleClose}
-                    maxWidth={false}
+                    fullWidth={fullWidth}
+                    maxWidth={maxWidth}
             >
-
                 <DialogTitle justifyContent="center" alignItems="center" display="flex"><b>Filters</b></DialogTitle>
                 <DialogContent>
                     <FormGroup defaultValue="rounded" sx={{
-                        alignItems: "center",
                         margin: "5.5px",
-
                     }}>
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"} spacing={1}>
-
+                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"} spacing={1} sx={{
+                            alignItems: "center",
+                        }}>
+                            <Divider/>
                             <FormControl sx={{width: "100%"}}>
 
                                 <AppBar position="static" sx={{boxShadow: "none"}}>
@@ -291,360 +378,350 @@ function EstateFilterComponent() {
                                             label="LEASE" {...PaymentTransactionTypeIndex(PaymentTransactionType.LEASE)} />
                                     </Tabs>
                                 </AppBar>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid container rowSpacing={"2px"} columnSpacing={"2px"} spacing={1}>
-                            <FormControl sx={{width: "100%", marginTop: "2px"}}>
-
-                                <AppBar position="static" sx={{boxShadow: "none"}}>
-                                    <Tabs
-                                        value={acquisitionStatus}
-                                        onChange={handleChangeAcquisitionStatus}
-                                        sx={{
-                                            backgroundColor: "white",
-                                        }}
-                                        variant="fullWidth"
-                                        aria-label="full width tabs example"
-
-                                    >
-                                        <Tab label="OPEN" {...AcquisitionStatusIndex(AcquisitionStatus.OPEN)} />
-                                        <Tab
-                                            label="ON-HOLD" {...AcquisitionStatusIndex(AcquisitionStatus.ON_HOLD)} />
-                                    </Tabs>
-                                </AppBar>
 
                             </FormControl>
                         </Grid>
+                        <Divider/>
 
-                        <Grid container
-                              sx={{
-                                  marginTop: "1px",
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('squareMetersFrom')} id="squareMetersFrom"
-                                               label="squareMetersFrom"
-                                               type="squareMetersFrom"/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('squareMetersTo')} id="squareMetersTo"
-                                               label="squareMetersTo"
-                                               type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
 
-                        <Grid container
-                              sx={{
-                                  marginTop: "1px",
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('numberOfRoomsFrom')} id="numberOfRoomsFrom"
-                                               label="numberOfRoomsFrom"
-                                               type="text"/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('numberOfRoomsTo')} id="numberOfRoomsTo"
-                                               label="numberOfRoomsTo"
-                                               type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Property type</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
 
-                        <Grid container
-                              sx={{
-                                  marginTop: "1px",
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('numberOfBathroomsFrom')} id="numberOfBathroomsFrom"
-                                               label="numberOfBathroomsFrom" type="text"/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('numberOfBathroomsTo')} id="numberOfBathroomsTo"
-                                               label="numberOfBathroomsTo" type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-                        <Grid container
-                              sx={{
-                                  marginTop: "1px",
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('numberOfGaragesFrom')} id="numberOfGaragesFrom"
-                                               label="numberOfGaragesFrom" type="text"/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('numberOfGaragesTo')} id="numberOfGaragesTo"
-                                               label="numberOfGaragesTo" type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-                        <Grid container
-                              sx={{
-                                  marginTop: "1px",
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('yearOfConstructionFrom')} id="yearOfConstructionFrom"
-                                               defaultValue={null}
-                                               label="yearOfConstructionFrom" type="text"/>
-                                </FormControl></Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('yearOfConstructionTo')} id="yearOfConstructionTo"
-                                               defaultValue={null}
-                                               label="yearOfConstructionTo" type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-
-                        <Grid container
-                              sx={{
-                                  marginTop: "1px",
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('priceFrom')} defaultValue={0} id="priceFrom"
-                                               label="priceFrom" type="text"/>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('priceTo')} defaultValue={0} id="priceTo" label="priceTo"
-                                               type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-
-                        <FormControl sx={{width: '100%'}}>
-                            <Button sx={{
-                                background: "#F1F1F1",
-                                color: "black",
-                                fontWeight: "bolder",
-                                m: 0.50,
-                                borderRadius: 2
-                            }} onClick={handleOpenModalForTypeOfEstate}>Choose type of estate</Button>
-                            <Modal
-                                open={openModalTypeOfEstate}
-                                onClose={handleCloseModalTypesOfEstate}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
                             >
-                                <Box sx={{
-                                    position: 'absolute' as 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: 700,
-                                    bgcolor: 'white',
-                                    borderRadius: '10px',
-                                    boxShadow: 24,
-                                    p: 4,
-                                }}>
-                                    <Typography id="modal-modal-title" variant="h6" component="h2"
-                                                justifyContent="center" alignItems="center" display="flex"
-                                                marginBottom="10px">
-                                        <b>Property Type</b>
-                                    </Typography>
-                                    <Divider/>
-                                    <Grid container
-                                          sx={{
-                                              marginBottom: "1px",
-                                          }}
-                                          spacing={12}
-                                    >
-                                        <Grid item xs={6}>
-                                            <FormGroup>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={MAGAZINE}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.MAGAZINE}/>
-                                                } label={TypeOfEstate.MAGAZINE}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={RESTAURANT}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.RESTAURANT}/>
-                                                } label={TypeOfEstate.RESTAURANT}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={CAFE}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.CAFE}/>
-                                                } label={TypeOfEstate.CAFE}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={HOTEL}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.HOTEL}/>
-                                                } label={TypeOfEstate.HOTEL}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={SALON}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.SALON}/>
-                                                } label={TypeOfEstate.SALON}/>
-                                            </FormGroup>
-                                        </Grid>
 
-                                        <Grid item xs={6}>
-                                            <FormGroup>
-
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={SINGLE_FAMILY}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.SINGLE_FAMILY}/>
-                                                } label={TypeOfEstate.SINGLE_FAMILY}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={TOWNHOUSE}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.TOWNHOUSE}/>
-                                                } label={TypeOfEstate.TOWNHOUSE}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={MULTI_FAMILY}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.MULTI_FAMILY}/>
-                                                } label={TypeOfEstate.MULTI_FAMILY}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={MODULAR_HOME}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.MODULAR_HOME}/>
-                                                } label={TypeOfEstate.MODULAR_HOME}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={RANCH_HOME}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.RANCH_HOME}/>
-                                                } label={TypeOfEstate.RANCH_HOME}/>
-                                            </FormGroup>
-                                        </Grid>
-                                    </Grid>
-                                    <Grid container
-                                          sx={{
-                                              marginBottom: "1px",
-                                          }}
-                                          spacing={12}
-                                    >
-                                        <Grid item xs={6}>
-                                            <FormGroup>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={RAILROAD}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.RAILROAD}/>
-                                                } label={TypeOfEstate.RAILROAD}/>
-
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={OFFICE}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.OFFICE}/>
-                                                } label={TypeOfEstate.OFFICE}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={STUDIO}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.STUDIO}/>
-                                                } label={TypeOfEstate.STUDIO}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={PENTHOUSE}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.PENTHOUSE}/>
-                                                } label={TypeOfEstate.PENTHOUSE}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={LOFT} onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.LOFT}/>
-                                                } label={TypeOfEstate.LOFT}/>
-                                            </FormGroup>
-                                        </Grid>
-
-                                        <Grid item xs={6}>
-                                            <FormGroup>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={CONDO} onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.CONDO}/>
-                                                } label={TypeOfEstate.CONDO}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={WING} onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.WING}/>
-                                                } label={TypeOfEstate.WING}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={GARDEN}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.GARDEN}/>
-                                                } label={TypeOfEstate.GARDEN}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={BARN} onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.BARN}/>
-                                                } label={TypeOfEstate.BARN}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={BUNGALOW}
-                                                              onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.BUNGALOW}/>
-                                                } label={TypeOfEstate.BUNGALOW}/>
-                                                <FormControlLabel control={
-                                                    <Checkbox checked={CABIN} onChange={handleStateOfTypeOfEstateChange}
-                                                              name={TypeOfEstate.CABIN}/>
-                                                } label={TypeOfEstate.CABIN}/>
-                                            </FormGroup>
-                                        </Grid>
-                                    </Grid>
+                                <Grid item xs={6}>
+                                    <FormGroup>
 
 
-                                    <Button sx={{
-                                        background: "#F1F1F1",
-                                        color: "black",
-                                        fontWeight: "bolder",
-                                        m: 0.50,
-                                        width: '25%',
-                                        borderRadius: 2
-                                    }} onClick={handleCloseModalTypesOfEstate}>choose</Button>
-                                </Box>
-                            </Modal>
-                        </FormControl>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={ALL}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="ALL"/>
+                                        } label={"All"}/>
 
-                        <Grid container
-                              sx={{
-                                  marginBottom: "1px"
-                              }}
-                              spacing={1}
-                        >
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('city')} defaultValue={null} id="city" label="city"
-                                               type="text"/>
-                                </FormControl>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={MAGAZINE}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="MAGAZINE"/>
+                                        } label={TypeOfEstate.MAGAZINE}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={RESTAURANT}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="RESTAURANT"/>
+                                        } label={TypeOfEstate.RESTAURANT}/>
+
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={OFFICE}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="OFFICE"/>
+                                        } label={TypeOfEstate.OFFICE}/>
+
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={STUDIO}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="STUDIO"/>
+                                        } label={TypeOfEstate.STUDIO}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={PENTHOUSE}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="PENTHOUSE"/>
+                                        } label={TypeOfEstate.PENTHOUSE}/>
+
+                                    </FormGroup>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormGroup>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={CONDO}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="CONDO"/>
+                                        } label={TypeOfEstate.CONDO}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={CABIN}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="CABIN"/>
+                                        } label={TypeOfEstate.CABIN}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={SINGLE_FAMILY}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="SINGLE_FAMILY"/>
+                                        } label={TypeOfEstate.SINGLE_FAMILY}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={TOWNHOUSE}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="TOWNHOUSE"/>
+                                        } label={TypeOfEstate.TOWNHOUSE}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={MULTI_FAMILY}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="MULTI_FAMILY"/>
+                                        } label={TypeOfEstate.MULTI_FAMILY}/>
+                                        <FormControlLabel control={
+                                            <Checkbox size="small" color="default" checked={RANCH_HOME}
+                                                      onChange={handleStateOfTypeOfEstateChange}
+                                                      name="RANCH_HOME"/>
+                                        } label={TypeOfEstate.RANCH_HOME}/>
+                                    </FormGroup>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={6}>
-                                <FormControl>
-                                    <TextField {...register('country')} defaultValue={null} id="country" label="country"
-                                               type="text"/>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
+                        </Box>
+                        <Divider/>
 
+
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Price</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
+
+                            >
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Min</FormLabel>
+                                        <Select defaultValue={0} name={priceFrom.name} onChange={priceFrom.onChange}
+                                                onBlur={priceFrom.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="1000">$1,000</MenuItem>
+                                            <MenuItem value="50000">$50,000</MenuItem>
+                                            <MenuItem value="75000">$75,000</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Max</FormLabel>
+                                        <Select defaultValue={0} name={priceTo.name} onChange={priceTo.onChange}
+                                                onBlur={priceTo.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="50000">$50,000</MenuItem>
+                                            <MenuItem value="75000">$75,000</MenuItem>
+                                            <MenuItem value="100000">$100,000</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                        <Divider/>
+
+
+                        <Divider/>
+
+
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Bedrooms</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
+
+                            >
+
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Min</FormLabel>
+                                        <Select defaultValue={0} name={numberOfRoomsFrom.name}
+                                                onChange={numberOfRoomsFrom.onChange} onBlur={numberOfRoomsFrom.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="1">Studio</MenuItem>
+                                            <MenuItem value="2">2</MenuItem>
+                                            <MenuItem value="3">3</MenuItem>
+                                            <MenuItem value="4">4</MenuItem>
+                                            <MenuItem value="5">5</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Max</FormLabel>
+                                        <Select defaultValue={0} name={numberOfRoomsTo.name}
+                                                onChange={numberOfRoomsTo.onChange} onBlur={numberOfRoomsTo.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="1">Studio</MenuItem>
+                                            <MenuItem value="2">2</MenuItem>
+                                            <MenuItem value="3">3</MenuItem>
+                                            <MenuItem value="4">4</MenuItem>
+                                            <MenuItem value="5">5</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                        <Divider/>
+
+
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Bathrooms</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
+                            >
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Max</FormLabel>
+                                        <Select defaultValue={0} name={numberOfRoomsTo.name}
+                                                onChange={numberOfRoomsTo.onChange} onBlur={numberOfRoomsTo.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="1">1+</MenuItem>
+                                            <MenuItem value="2">2+</MenuItem>
+                                            <MenuItem value="3">3+</MenuItem>
+                                            <MenuItem value="4">4+</MenuItem>
+                                            <MenuItem value="5">5+</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                            </Grid>
+                        </Box>
+                        <Divider/>
+
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Land size</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
+                            >
+                                <Grid item xs={6}>
+
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Min</FormLabel>
+                                        <Select defaultValue={0} name={squareMetersFrom.name}
+                                                onChange={squareMetersFrom.onChange} onBlur={squareMetersFrom.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="100">100 m&#178;</MenuItem>
+                                            <MenuItem value="200">200 m&#178;</MenuItem>
+                                            <MenuItem value="300">300 m&#178;</MenuItem>
+                                            <MenuItem value="400">400 m&#178;</MenuItem>
+                                            <MenuItem value="500">500 m&#178;</MenuItem>
+                                        </Select>
+
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Max</FormLabel>
+                                        <Select defaultValue={0} name={squareMetersTo.name}
+                                                onChange={squareMetersTo.onChange} onBlur={squareMetersTo.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="100">100 m&#178;</MenuItem>
+                                            <MenuItem value="200">200 m&#178;</MenuItem>
+                                            <MenuItem value="300">300 m&#178;</MenuItem>
+                                            <MenuItem value="400">400 m&#178;</MenuItem>
+                                            <MenuItem value="500">500 m&#178;</MenuItem>
+                                            <MenuItem value="600">600 m&#178;</MenuItem>
+                                        </Select>
+
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                        <Divider/>
+
+
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Garages</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
+                            >
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <Select defaultValue={0} name={garagesFrom.name}
+                                                onChange={garagesFrom.onChange} onBlur={garagesFrom.onBlur}>
+                                            <MenuItem value="0"><em>Any</em></MenuItem>
+                                            <MenuItem value="1">1+</MenuItem>
+                                            <MenuItem value="2">2+</MenuItem>
+                                            <MenuItem value="3">3+</MenuItem>
+                                            <MenuItem value="4">4+</MenuItem>
+                                            <MenuItem value="5">5+</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                            </Grid>
+                        </Box>
+                        <Divider/>
+
+                        <Box sx={{margin: "20px"}}>
+                            <Typography variant="subtitle1" alignItems="left"><b>Location</b></Typography>
+                            <Grid container
+                                  sx={{
+                                      marginTop: "1px",
+                                      marginBottom: "1px",
+                                      alignItems: "center",
+                                  }}
+                                  spacing={1}
+                            >
+                                <Grid item xs={6}>
+
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>City</FormLabel>
+                                        <TextField {...register('city')} defaultValue={null} id="city" label="Any"
+                                                   type="text"/>
+
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl sx={{width: "100%"}}>
+                                        <FormLabel>Country</FormLabel>
+                                        <TextField {...register('country')} defaultValue={null} id="country"
+                                                   label="Any"
+                                                   type="text"/>
+
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                        <Divider/>
+
+
+                        {/*<Grid container rowSpacing={"2px"} columnSpacing={"2px"} spacing={1}>*/}
+                        {/*    <FormControl sx={{width: "100%", marginTop: "2px"}}>*/}
+
+                        {/*        <AppBar position="static" sx={{boxShadow: "none"}}>*/}
+                        {/*            <Tabs*/}
+                        {/*                value={acquisitionStatus}*/}
+                        {/*                onChange={handleChangeAcquisitionStatus}*/}
+                        {/*                sx={{*/}
+                        {/*                    backgroundColor: "white",*/}
+                        {/*                }}*/}
+                        {/*                variant="fullWidth"*/}
+                        {/*                aria-label="full width tabs example"*/}
+
+                        {/*            >*/}
+                        {/*                <Tab label="OPEN" {...AcquisitionStatusIndex(AcquisitionStatus.OPEN)} />*/}
+                        {/*                <Tab*/}
+                        {/*                    label="ON-HOLD" {...AcquisitionStatusIndex(AcquisitionStatus.ON_HOLD)} />*/}
+                        {/*            </Tabs>*/}
+                        {/*        </AppBar>*/}
+
+                        {/*    </FormControl>*/}
+                        {/*</Grid>*/}
 
                     </FormGroup>
                 </DialogContent>
@@ -759,7 +836,25 @@ function EstateFilterComponent() {
                                             Recently added estates
                                         </Typography>
                                     </Box>
-                                    <EstatesList  estates={latestEstates} page={1} pageSize={10}/>
+                                    <EstatesList estates={latestEstates} page={1} pageSize={6}/>
+                                </> : <></>
+                        }
+                        {
+
+                            articles ?
+                                <>
+                                    <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
+                                        <Typography variant="h5" style={{
+                                            fontFamily: 'Arial',
+                                            fontWeight: "bold",
+                                            margin: "10px"
+                                        }}>
+                                            Recently added articles
+                                        </Typography>
+                                    </Box>
+                                    <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
+                                        <ArticlesList articles={articles}></ArticlesList>
+                                    </Box>
                                 </> : <></>
                         }
 

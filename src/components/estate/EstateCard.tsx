@@ -21,7 +21,6 @@ const EstatesCard: React.FC<{ estate: IEstate }> = ({estate}) => {
                 setEstateDetails(res.data)
             }
         )
-        console.log(estate.estatePhotos)
     }, [estate])
     return (
         <div className="col">

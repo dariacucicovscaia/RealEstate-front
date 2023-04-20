@@ -10,12 +10,16 @@ import {
     Stack,
     TextField
 } from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, {SyntheticEvent, useEffect, useState} from "react";
 import {useAuthHeader, useAuthUser} from "react-auth-kit";
 import UserService from "../../services/user.service";
 import AdminPanelFullUser from "../../types/AdminPanelFullUser";
 import NewsService from "../../services/news.service";
 import IArticle from "../../types/IArticle";
+import {EditorState} from "draft-js";
+import {Editor} from "react-draft-wysiwyg";
+import axios from "axios";
+import {routes} from "../../config/routes";
 
 function NewArticleForm() {
 
@@ -24,13 +28,45 @@ function NewArticleForm() {
     const authHeader = useAuthHeader();
     const [userDetails, setUserDetails] = useState<AdminPanelFullUser>()
     const [articleCreated, setCreatedArticle] = useState<IArticle>();
+    const [imageUrl, setImageUrl] = useState("");
+    const hiddenFileInput = React.useRef(null);
+    const [uploadedPictures, setUploadedPictures] = useState<File>();
+
+    const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+    const onEditorStateChange = (e: EditorState) => {
+        setEditorState(e)
+
+    }
+    const handleClick = (event: any) => {
+        event.preventDefault();
+        // @ts-ignore
+        hiddenFileInput.current.click();
+    };
     useEffect(() => {
         setLoaded(false)
         UserService.getUserDetails(user()?.id, authHeader()).then(resp => setUserDetails(resp.data))
-        console.log("done")
     }, [loaded])
 
+    const handleFileUpload = (file: File) => {
+        console.log(file)
+        const userEmail = user()?.email.substring(0, user()?.email.lastIndexOf("@"))
 
+
+        const data = new FormData();
+        data.append('file', file)
+        data.append('userName', userEmail)
+        axios.post(routes.STATIC_CONTENT_URL + '/uploadArticlePic', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((e) => console.error(e))
+
+    };
     return (
         <Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
 
@@ -40,6 +76,8 @@ function NewArticleForm() {
                         title: '',
                         description: '',
                         content: '',
+                        imagePath: '',
+                        imageCapture: '',
                         firstName: userDetails?.firstName,
                         lastName: userDetails?.lastName,
                         externalId: user()?.id,
@@ -50,12 +88,22 @@ function NewArticleForm() {
                         try {
                             values.firstName = userDetails?.firstName
                             values.lastName = userDetails?.lastName
+                            var text = editorState.getCurrentContent().getBlocksAsArray();
+                            text.map((item) => {
+                                values.content = item.getText()
+                            });
+
                             console.log(values)
 
                             // @ts-ignore
                             NewsService.saveArticle(values).then(resp => {
                                 setCreatedArticle(resp.data)
+                                if (uploadedPictures) {
+                                    console.log("uploading")
+                                    handleFileUpload(uploadedPictures)
+                                }
                             })
+
 
                             setLoaded(true);
                             setStatus({success: false});
@@ -112,25 +160,13 @@ function NewArticleForm() {
                                 </Stack>
                             </Grid>
                             <Grid item xs={12}>
-                                <Stack spacing={1}>
-                                    <TextField
-                                        id="content-newArticle"
-                                        type="content"
-                                        value={values.content}
-                                        name="content"
-                                        label="content"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        placeholder="Content for your article"
-                                        fullWidth
-                                        error={Boolean(touched.content && errors.content)}
-                                    />
-                                    {touched.content && errors.content && (
-                                        <FormHelperText error id="helper-text-content-signup">
-                                            {errors.content}
-                                        </FormHelperText>
-                                    )}
-                                </Stack>
+                                <Editor
+                                    editorState={editorState}
+                                    toolbarClassName="toolbarClassName"
+                                    wrapperClassName="wrapperClassName"
+                                    editorClassName="editorClassName"
+                                    onEditorStateChange={onEditorStateChange}
+                                />
                             </Grid>
 
 
@@ -150,6 +186,46 @@ function NewArticleForm() {
                             </Grid>
 
 
+                            <div className="flex flex-col items-start mb-2">
+                                <Button
+                                    fullWidth
+                                    sx={{
+                                        background: "white",
+                                        color: "black",
+                                        fontWeight: "bolder",
+                                        m: 0.50,
+                                        width: '100%',
+                                        borderRadius: 2
+                                    }}
+                                    onClick={handleClick}
+                                >
+                                    Upload picture
+                                </Button>
+                                <input
+                                    type="file"
+                                    ref={hiddenFileInput}
+                                    onChange={(e) => {
+                                        if (e.target.files) {
+                                            setUploadedPictures(e.target.files[0]);
+                                            console.log(e.target.files[0])
+
+                                            const userEmail = user()?.email.substring(0, user()?.email.lastIndexOf("@"))
+                                            values.imagePath = ("/article/" + userEmail + "/" + e.target.files[0].name)
+                                            setImageUrl(URL.createObjectURL(e.target.files[0]))
+
+                                        }
+                                    }}
+                                    style={{display: "none"}}
+                                />
+                                <Box justifyContent="center" alignItems="center" display="flex">
+                                    {
+                                        imageUrl &&
+                                        uploadedPictures ?
+                                            <img src={imageUrl} height="200px" style={{margin: "2px"}}/>
+                                            : <></>
+                                    }
+                                </Box>
+                            </div>
                             <Button type="submit">Submit</Button>
                         </form>
                     )}

@@ -2,11 +2,13 @@ import React, {SyntheticEvent, useContext, useEffect, useState} from "react";
 
 import Page from "../types/Page";
 import {useAuthHeader, useAuthUser} from "react-auth-kit";
-import {Pagination} from "@mui/material";
+import {Button, Pagination} from "@mui/material";
 import Box from "@mui/material/Box";
 import IEstate from "../types/IEstate";
 import EstateService from "../services/estate.service";
 import EstatesList from "../components/estate/EstatesList";
+import Typography from "@mui/material/Typography";
+import {useNavigate} from "react-router-dom";
 
 function OwnerEstates() {
 
@@ -16,7 +18,7 @@ function OwnerEstates() {
     const [page, setPage] = useState<number>(1);
     const pageSize = 5;
     const [loaded, setLoaded] = useState(false);
-
+    const navigate = useNavigate();
     const getPageNumber = () => {
         let nrOfPages = 0;
         if (estates) {
@@ -44,25 +46,50 @@ function OwnerEstates() {
     })
 
     return (
-        <div>
+        <Box >
 
-            {estates ?
-                <div>
+            {estates && (estates.content.length >= 1) ?
+                <Box>
                     <EstatesList estates={estates} page={page} pageSize={pageSize}/>
-                    <Box justifyContent={"right"} alignItems={"right"} display={"flex"}>
-                        <Pagination sx={{
-                            flexGrow: 1,
-                            mr: 3,
-                            mt: 1,
-                        }} size="large" count={getPageNumber()} page={page} onChange={handleChange}
+
+                    <Box justifyContent={"center"} alignItems={"center"} display={"flex"}  sx={{marginTop:"16px"}}>
+                        <Pagination  size="large" count={getPageNumber()} page={page} onChange={handleChange}
                                     variant="outlined"/>
 
                     </Box>
 
-                </div>
+                </Box>
                 :
-                <>no data</>}
-        </div>
+                <div>
+
+                    <Typography sx={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        display: "flex",
+                    }} variant="subtitle1">You dont have any estates put up for registration, you can add one following
+                        the link bellow!</Typography>
+                    <Box sx={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        display: "flex",
+                    }}>
+                        <Button
+                            onClick={()=> navigate("/registerEstate")}
+                            sx={{
+                                background: "white",
+                                color: "black",
+                                fontWeight: "bolder",
+                                m: 0.50,
+                                width: '100%',
+                                borderRadius: 2,
+
+                            }}
+                        >Register an estate</Button>
+
+                    </Box>
+                </div>
+            }
+        </Box>
 
     )
 }

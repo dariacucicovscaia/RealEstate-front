@@ -20,6 +20,8 @@ import EditProfile from "./components/EditProfile";
 import CreateEstateForm from "./components/multistep/CreateEstateForm";
 import Registration from "./pages/Registration";
 import NewArticleForm from "./components/news/NewArticleForm";
+import ArticlePage from "./pages/ArticlePage";
+import ArticleDetails from "./pages/ArticleDetails";
 
 class App extends Component {
     render() {
@@ -42,16 +44,18 @@ class App extends Component {
                         />
                         <Route path="confirm-appointment/:appointmentId" element={<AppointmentConfirmationPage/>}/>
                         <Route path="/details/:id" element={<EstateDetails/>}/>
-
+                        <Route path="/article-page" element={<ArticlePage/>}/>
+                        <Route path="/article/:id" element={<ArticleDetails/>}/>
                         <Route element={<AuthRoute allowedRoles={["ADMIN"]}/>}>
                             <Route path="/adminPanel" element={<AdminPanel/>}/>
                             <Route path="/dynamic-app-props" element={<DynamicAppProperties/>}/>
                         </Route>
-                        {/*<Route element={<AuthRoute allowedRoles={["AUTHOR"]}/>}>*/}
+                        <Route element={<AuthRoute allowedRoles={["AUTHOR"]}/>}>
                             <Route path="/create-new-article" element={<NewArticleForm/>}/>
-                        {/*</Route>*/}
+                        </Route>
                         <Route element={<AuthRoute allowedRoles={["USER"]}/>}>
                             <Route path="/myAppointments" element={<AllUsersAppointments/>}/>
+
                             <Route path="/profile" element={<ProfilePage/>}/>
                             <Route path="/registerEstate" element={<CreateEstateForm/>}/>
                             <Route path="/allMyEstates" element={<OwnerEstates/>}/>

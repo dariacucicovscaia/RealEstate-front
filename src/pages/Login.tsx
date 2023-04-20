@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import LoginDTO from "../types/LoginDTO";
 import LoginService from "../services/login.service";
 import {useForm} from "react-hook-form";
@@ -11,6 +11,7 @@ import {useSignIn} from "react-auth-kit";
 import UserService from "../services/user.service";
 import AdminPanelFullUser from "../types/AdminPanelFullUser";
 import Cookies from "universal-cookie";
+import NewsService from "../services/news.service";
 
 const Login = () => {
     const {register, handleSubmit} = useForm<LoginDTO>();
@@ -22,7 +23,6 @@ const Login = () => {
     const cookies = new Cookies();
 
     const onLogin = handleSubmit(loginDTO => {
-
         LoginService.login(loginDTO).then(res => {
             const token = JwtService.decodeToken(res.data.token)
             signIn({
@@ -33,14 +33,12 @@ const Login = () => {
             })
             console.log("signed in " + token.email)
             UserService.getUserDetails(token.id, "Bearer " + res.data.token).then((resp) => {
-
                     setUser(resp.data)
                     cookies.set('userProfileUpdate', resp.data)
                     console.log("done")
                 }
             )
-            navigate("/")
-            refresh()
+
 
         }).catch((function (error) {
             if (error.response) {
@@ -48,6 +46,17 @@ const Login = () => {
             }
         }))
     })
+
+    useEffect(() => {
+        if (user && user.id)
+            NewsService.createUser(user.id, user.firstName, user.lastName).then(resp => {
+                console.log(resp.data)
+                navigate("/")
+                refresh()
+            })
+    }, [user])
+
+
     return (
         <Box justifyContent={"center"} alignItems={"center"} display={"flex"}
              sx={{margin: "20px 0px", outline: "outlined"}}>
